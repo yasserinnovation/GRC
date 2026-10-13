@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_documentation element="reg_impacted" label="Regulatory Impacted" language="en" table="x_snc_se_grc_vp_0_grc_policy">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>reg_impacted</element>
+            <help/>
+            <hint/>
+            <label>Regulatory Impacted</label>
+            <language>en</language>
+            <name>x_snc_se_grc_vp_0_grc_policy</name>
+            <plural>Regulatory Impacted</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2026-10-13 09:30:51</sys_created_on>
+            <sys_id>e7e3923cead94357be768b3c4fcafa10</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Regulatory Impacted</sys_name>
+            <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+            <sys_update_name>sys_documentation_x_snc_se_grc_vp_0_grc_policy_reg_impacted_en</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2026-10-13 09:30:51</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+</record_update>

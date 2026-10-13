@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="x_snc_se_grc_vp_0_grc_risk">
+    <x_snc_se_grc_vp_0_grc_risk action="INSERT_OR_UPDATE">
+        <appetite>70</appetite>
+        <business_unit>Finance</business_unit>
+        <category>Financial</category>
+        <control_effectiveness>88</control_effectiveness>
+        <financial_exposure>78</financial_exposure>
+        <name>Financial Controls</name>
+        <residual_score>61</residual_score>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 09:31:54</sys_created_on>
+        <sys_id>291357e3013341fbabb94a34dd880e33</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-13 09:31:54</sys_updated_on>
+        <tolerance>78</tolerance>
+    </x_snc_se_grc_vp_0_grc_risk>
+</record_update>

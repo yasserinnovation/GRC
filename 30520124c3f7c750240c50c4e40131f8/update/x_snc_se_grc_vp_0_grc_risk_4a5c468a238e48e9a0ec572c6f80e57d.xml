@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="x_snc_se_grc_vp_0_grc_risk">
+    <x_snc_se_grc_vp_0_grc_risk action="INSERT_OR_UPDATE">
+        <appetite>85</appetite>
+        <business_unit>Operations</business_unit>
+        <category>Operational</category>
+        <control_effectiveness>61</control_effectiveness>
+        <financial_exposure>92</financial_exposure>
+        <name>Operational Resilience</name>
+        <residual_score>82</residual_score>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 09:31:54</sys_created_on>
+        <sys_id>4a5c468a238e48e9a0ec572c6f80e57d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-13 09:31:54</sys_updated_on>
+        <tolerance>90</tolerance>
+    </x_snc_se_grc_vp_0_grc_risk>
+</record_update>

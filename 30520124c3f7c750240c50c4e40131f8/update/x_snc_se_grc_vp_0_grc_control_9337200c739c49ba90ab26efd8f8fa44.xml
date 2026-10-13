@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="x_snc_se_grc_vp_0_grc_control">
+    <x_snc_se_grc_vp_0_grc_control action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <business_unit>Operations</business_unit>
+        <control_id>OPS-CTRL-07</control_id>
+        <effectiveness>72</effectiveness>
+        <family>Operational</family>
+        <name>Grid Reliability Reporting Control</name>
+        <owner>Grid Operations</owner>
+        <reg_impacted>false</reg_impacted>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 09:31:53</sys_created_on>
+        <sys_id>9337200c739c49ba90ab26efd8f8fa44</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-13 09:31:53</sys_updated_on>
+    </x_snc_se_grc_vp_0_grc_control>
+</record_update>
