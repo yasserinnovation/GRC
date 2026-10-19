@@ -272,12 +272,12 @@ DoAIntelligence.prototype = {
     return { ok: true, kpis: {
       doa_rules_total: count(this.RULE, ''),
       doa_rules_active: count(this.RULE, 'status=active'),
-      expired_delegations: count(this.RULE, 'status=expired^OReffective_toLESSTHAN' + t),
-      exceptions_open: count(this.EXC, 'statusNOT IN closed,dismissed'),
-      outside_authority: count(this.EXC, 'issue_type=limit_violation^statusNOT IN closed,dismissed'),
-      conflicts_open: count(this.EXC, 'issue_typeIN policy_conflict,control_conflict^statusNOT IN closed,dismissed'),
-      tasks_open: count(this.EXC, 'taskISNOTEMPTY^statusNOT IN closed,dismissed'),
-      exceptions_closed: count(this.EXC, 'statusIN closed,dismissed')
+      expired_delegations: count(this.RULE, 'status=expired^OReffective_to<' + t),
+      exceptions_open: count(this.EXC, 'statusNOT INclosed,dismissed'),
+      outside_authority: count(this.EXC, 'issue_type=limit_violation^statusNOT INclosed,dismissed'),
+      conflicts_open: count(this.EXC, 'issue_typeINpolicy_conflict,control_conflict^statusNOT INclosed,dismissed'),
+      tasks_open: count(this.EXC, 'taskISNOTEMPTY^statusNOT INclosed,dismissed'),
+      exceptions_closed: count(this.EXC, 'statusINclosed,dismissed')
     } };
   },
   type: 'DoAIntelligence'
