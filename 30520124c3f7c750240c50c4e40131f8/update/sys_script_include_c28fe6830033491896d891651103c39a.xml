@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_snc_se_grc_vp_0.DoAIntelligence</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Delegation of Authority Intelligence backend. Dispatch via process(op, args).</description>
+        <mobile_callable>false</mobile_callable>
+        <name>DoAIntelligence</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var DoAIntelligence = Class.create();
+DoAIntelligence.prototype = {
+  initialize: function () {
+    this.RULE = 'x_snc_se_grc_vp_0_doa_rule';
+    this.EXC = 'x_snc_se_grc_vp_0_doa_exception';
+    this.ACTION = 'x_snc_se_grc_vp_0_reg_action';
+    this.POLICY = 'x_snc_se_grc_vp_0_grc_policy';
+    this.CONTROL = 'x_snc_se_grc_vp_0_grc_control';
+    this.RISK = 'x_snc_se_grc_vp_0_grc_risk';
+  },
+  process: function (op, args) {
+    args = args || {};
+    try {
+      if (op === 'listDoARules') return this.listDoARules(args);
+      if (op === 'listDoAExceptions') return this.listDoAExceptions(args);
+      if (op === 'saveDoARule') return this.saveDoARule(args);
+      if (op === 'setRuleStatus') return this.setRuleStatus(args);
+      if (op === 'importDoARules') return this.importDoARules(args);
+      if (op === 'askDoA') return this.askDoA(args);
+      if (op === 'checkAuthority') return this.checkAuthority(args);
+      if (op === 'createDoAException') return this.createDoAException(args);
+      if (op === 'analyzeDoAConflicts') return this.analyzeDoAConflicts(args);
+      if (op === 'saveDoAReview') return this.saveDoAReview(args);
+      if (op === 'createDoATask') return this.createDoATask(args);
+      if (op === 'getDoAKpis') return this.getDoAKpis(args);
+      if (op === 'selfTest') return { ok: true, version: 'doa-1.0.0' };
+      return { ok: false, error: 'Unknown op: ' + op };
+    } catch (e) { return { ok: false, error: '' + e }; }
+  },
+  _pad: function (n, w) { var s = '' + n; while (s.length < w) s = '0' + s; return s; },
+  _today: function () { return new GlideDate().getValue(); },
+  _num: function (table, prefix) {
+    var a = new GlideAggregate(table); a.addAggregate('COUNT'); a.query();
+    var n = 0; if (a.next()) n = parseInt(a.getAggregate('COUNT'), 10) || 0;
+    return prefix + this._pad(n + 1, 5);
+  },
+  _isEffective: function (gr) {
+    if (('' + gr.getValue('status')) !== 'active') return false;
+    var t = this._today(); var f = gr.getValue('effective_from'); var e = gr.getValue('effective_to');
+    if (f && f > t) return false;
+    if (e && e < t) return false;
+    return true;
+  },
+  _hasArabic: function (s) { s = '' + (s || ''); for (var i = 0; i < s.length; i++) { var c = s.charCodeAt(i); if (c >= 1536 && c <= 1791) return true; } return false; },
+  _fmt: function (n) { n = parseFloat(n) || 0; try { return n.toLocaleString('en-US'); } catch (e) { return '' + n; } },
+  _ruleJson: function (gr) {
+    return {
+      sys_id: gr.getUniqueValue(), number: gr.getValue('number'), entity: gr.getValue('entity'),
+      business_unit: gr.getValue('business_unit'), department: gr.getValue('department'),
+      authority_role: gr.getValue('authority_role'), holder: gr.getValue('holder'),
+      transaction_type: gr.getValue('transaction_type'), approval_limit: parseFloat(gr.getValue('approval_limit') || '0'),
+      currency: gr.getValue('currency') || 'SAR', conditions: gr.getValue('conditions'),
+      escalation_authority: gr.getValue('escalation_authority'), effective_from: gr.getValue('effective_from'),
+      effective_to: gr.getValue('effective_to'), status: gr.getValue('status'), version: gr.getValue('version'),
+      governing_reference: gr.getValue('governing_reference'), governing_policy: gr.getValue('governing_policy'),
+      is_demo: gr.getValue('is_demo') == '1', effective: this._isEffective(gr)
+    };
+  },
+  _excJson: function (gr) {
+    return {
+      sys_id: gr.getUniqueValue(), number: gr.getValue('number'), short_description: gr.getValue('short_description'),
+      issue_type: gr.getValue('issue_type'), doa_rule: gr.getValue('doa_rule'), policy: gr.getValue('policy'),
+      control: gr.getValue('control'), risk: gr.getValue('risk'), publication: gr.getValue('publication'),
+      requirement: gr.getValue('requirement'), task: gr.getValue('task'), task_number: gr.getDisplayValue('task'),
+      owner: gr.getValue('owner'), priority: gr.getValue('priority'), status: gr.getValue('status'),
+      reason: gr.getValue('reason'), suggested_correction: gr.getValue('suggested_correction'),
+      amount: parseFloat(gr.getValue('amount') || '0'), transaction_type: gr.getValue('transaction_type'),
+      business_unit: gr.getValue('business_unit'), entity: gr.getValue('entity'), approver_role: gr.getValue('approver_role'),
+      reviewer: gr.getValue('reviewer'), reviewed_on: gr.getValue('reviewed_on'), is_demo: gr.getValue('is_demo') == '1',
+      policy_label: gr.getDisplayValue('policy'), control_label: gr.getDisplayValue('control'),
+      risk_label: gr.getDisplayValue('risk'), rule_label: gr.getDisplayValue('doa_rule'), publication_label: gr.getDisplayValue('publication')
+    };
+  },
+  listDoARules: function (args) {
+    var g = new GlideRecord(this.RULE);
+    if (args.business_unit) g.addQuery('business_unit', args.business_unit);
+    if (args.transaction_type) g.addQuery('transaction_type', args.transaction_type);
+    if (args.status) g.addQuery('status', args.status);
+    g.orderBy('business_unit'); g.orderBy('transaction_type'); g.orderBy('approval_limit'); g.query();
+    var out = []; while (g.next()) out.push(this._ruleJson(g));
+    return { ok: true, rules: out, count: out.length };
+  },
+  listDoAExceptions: function (args) {
+    var g = new GlideRecord(this.EXC);
+    if (args.status) g.addQuery('status', args.status);
+    if (args.openOnly) g.addQuery('status', 'NOT IN', 'closed,dismissed');
+    g.orderByDesc('sys_created_on'); g.setLimit(args.limit ? parseInt(args.limit, 10) : 100); g.query();
+    var out = []; while (g.next()) out.push(this._excJson(g));
+    return { ok: true, exceptions: out, count: out.length };
+  },
+  saveDoARule: function (args) {
+    var r = args.rule || args; var g = new GlideRecord(this.RULE); var isNew = true;
+    if (args.sys_id || r.sys_id) { if (g.get(args.sys_id || r.sys_id)) isNew = false; }
+    if (isNew) { g.initialize(); g.setValue('number', this._num(this.RULE, 'DOA')); g.setValue('is_demo', r.is_demo ? true : false); }
+    var f = ['entity','business_unit','department','authority_role','holder','transaction_type','approval_limit','currency','conditions','escalation_authority','effective_from','effective_to','status','version','governing_reference','governing_policy'];
+    for (var i = 0; i < f.length; i++) { if (r[f[i]] !== undefined && r[f[i]] !== null) g.setValue(f[i], r[f[i]]); }
+    var id = isNew ? g.insert() : (g.update(), g.getUniqueValue());
+    return { ok: true, sys_id: id, number: g.getValue('number'), created: isNew };
+  },
+  setRuleStatus: function (args) {
+    var g = new GlideRecord(this.RULE);
+    if (!args.sys_id || !g.get(args.sys_id)) return { ok: false, error: 'Rule not found' };
+    g.setValue('status', args.status || 'active'); g.update();
+    return { ok: true, sys_id: g.getUniqueValue(), status: g.getValue('status') };
+  },
+  importDoARules: function (args) {
+    var rows = args.rows; if (!rows && args.csv) rows = this._parseCsv(args.csv);
+    if (!rows || !rows.length) return { ok: false, error: 'No rows to import' };
+    var created = 0, errors = [];
+    for (var i = 0; i < rows.length; i++) { try { var res = this.saveDoARule({ rule: rows[i] }); if (res.ok) created++; } catch (e) { errors.push('Row ' + i + ': ' + e); } }
+    return { ok: true, created: created, errors: errors };
+  },
+  _parseCsv: function (csv) {
+    var raw = '' + csv; var lines = raw.split(String.fromCharCode(10));
+    var clean = [];
+    for (var i = 0; i < lines.length; i++) { var ln = lines[i].split(String.fromCharCode(13)).join(''); if (ln.length) clean.push(ln); }
+    if (clean.length < 2) return [];
+    var hdr = clean[0].split(','); for (var h = 0; h < hdr.length; h++) hdr[h] = ('' + hdr[h]).trim();
+    var out = [];
+    for (var j = 1; j < clean.length; j++) {
+      var cells = clean[j].split(','); var obj = {};
+      for (var k = 0; k < hdr.length; k++) obj[hdr[k]] = (cells[k] || '').trim();
+      if (obj.approval_limit) { var num = ''; var av = '' + obj.approval_limit; for (var z = 0; z < av.length; z++) { var cc = av.charAt(z); if ((cc >= '0' && cc <= '9') || cc === '.') num += cc; } obj.approval_limit = parseFloat(num) || 0; }
+      obj.is_demo = true; out.push(obj);
+    }
+    return out;
+  },
+  _detectAmount: function (q) {
+    var s = ('' + q).toLowerCase(); var mult = 1;
+    if (s.indexOf('million') >= 0 || s.indexOf('مليون') >= 0) mult = 1000000;
+    else if (s.indexOf('thousand') >= 0 || s.indexOf('ألف') >= 0 || s.indexOf('الف') >= 0) mult = 1000;
+    var nums = [], cur = '';
+    for (var i = 0; i < s.length; i++) { var ch = s.charAt(i); if (ch >= '0' && ch <= '9') cur += ch; else if (ch === '.' && cur.length) cur += ch; else if (ch === ',') { } else { if (cur.length) { nums.push(parseFloat(cur)); cur = ''; } } }
+    if (cur.length) nums.push(parseFloat(cur));
+    var max = 0; for (var k = 0; k < nums.length; k++) if (nums[k] > max) max = nums[k];
+    if (mult > 1 && max < 1000) max = max * mult;
+    return max;
+  },
+  _detectBU: function (q) {
+    var s = ('' + q).toLowerCase();
+    if (s.indexOf('operations') >= 0 || s.indexOf('العمليات') >= 0 || s.indexOf('تشغيل') >= 0) return 'Operations';
+    if (s.indexOf('procurement') >= 0 || s.indexOf('المشتريات') >= 0 || s.indexOf('شراء') >= 0) return 'Procurement';
+    if (s.indexOf('finance') >= 0 || s.indexOf('المالية') >= 0) return 'Finance';
+    if (s.indexOf('legal') >= 0 || s.indexOf('القانونية') >= 0) return 'Legal';
+    return '';
+  },
+  _detectTx: function (q) {
+    var s = ('' + q).toLowerCase();
+    if (s.indexOf('procure') >= 0 || s.indexOf('purchase') >= 0 || s.indexOf('مشتريات') >= 0 || s.indexOf('شراء') >= 0) return 'Procurement';
+    if (s.indexOf('payment') >= 0 || s.indexOf('دفع') >= 0) return 'Payment';
+    if (s.indexOf('contract') >= 0 || s.indexOf('عقد') >= 0) return 'Contract';
+    if (s.indexOf('capital') >= 0 || s.indexOf('capex') >= 0 || s.indexOf('رأسمال') >= 0) return 'Capital Expenditure';
+    return '';
+  },
+  askDoA: function (args) {
+    var q = args.question || ''; var ar = this._hasArabic(q) || args.lang === 'ar';
+    var bu = args.business_unit || this._detectBU(q);
+    var tx = args.transaction_type || this._detectTx(q);
+    var amount = args.amount != null ? parseFloat(args.amount) : this._detectAmount(q);
+    var missing = [];
+    if (!bu) missing.push(ar ? 'وحدة الأعمال' : 'business unit');
+    if (!tx) missing.push(ar ? 'نوع المعاملة' : 'transaction type');
+    if (!amount) missing.push(ar ? 'المبلغ' : 'amount');
+    if (missing.length) return { ok: true, clarify: true, missing: missing, message: (ar ? 'يرجى تحديد: ' : 'Please specify: ') + missing.join(ar ? '، ' : ', ') };
+    var g = new GlideRecord(this.RULE); g.addQuery('business_unit', bu); g.addQuery('transaction_type', tx); g.orderBy('approval_limit'); g.query();
+    var chosen = null, ladder = [];
+    while (g.next()) { if (!this._isEffective(g)) continue; var rj = this._ruleJson(g); ladder.push(rj); if (!chosen && rj.approval_limit >= amount) chosen = rj; }
+    if (!chosen) {
+      var msgNo = ar ? ('لا توجد صلاحية مسجّلة تكفي لاعتماد ' + this._fmt(amount) + ' ريال في ' + bu + '. يلزم تصعيد أو مراجعة.') : ('No recorded authority is sufficient to approve SAR ' + this._fmt(amount) + ' for ' + tx + ' in ' + bu + '. Escalation or review required.');
+      return { ok: true, answer: msgNo, authorized_role: null, amount: amount, business_unit: bu, transaction_type: tx, ladder: ladder };
+    }
+    var explain = ar
+      ? ('الجهة المخوّلة باعتماد ' + this._fmt(amount) + ' ريال (' + tx + ') في ' + bu + ' هي «' + chosen.authority_role + '» بحد اعتماد ' + this._fmt(chosen.approval_limit) + ' ريال. التصعيد: ' + (chosen.escalation_authority || '-') + '. المصدر: ' + chosen.number + '.')
+      : ('For SAR ' + this._fmt(amount) + ' ' + tx + ' in ' + bu + ', the authorized approver is "' + chosen.authority_role + '" (limit SAR ' + this._fmt(chosen.approval_limit) + '). Escalation: ' + (chosen.escalation_authority || '-') + '. Source: ' + chosen.number + '.');
+    return { ok: true, answer: explain, authorized_role: chosen.authority_role, approval_threshold: chosen.approval_limit, currency: chosen.currency, escalation: chosen.escalation_authority, conditions: chosen.conditions, amount: amount, business_unit: bu, transaction_type: tx, source: { number: chosen.number, sys_id: chosen.sys_id, reference: chosen.governing_reference }, ladder: ladder };
+  },
+  checkAuthority: function (args) {
+    var bu = args.business_unit || '', tx = args.transaction_type || '';
+    var amount = parseFloat(args.amount || '0'); var role = args.approver_role || ''; var entity = args.entity || '';
+    if (!bu || !tx || !amount || !role) return { ok: true, result: 'REVIEW_REQUIRED', reason: 'Missing input: business unit, transaction type, amount and approver role are all required.' };
+    var g = new GlideRecord(this.RULE); g.addQuery('business_unit', bu); g.addQuery('transaction_type', tx); g.addQuery('authority_role', role);
+    if (entity) g.addQuery('entity', entity);
+    g.query(); var matches = []; while (g.next()) matches.push(this._ruleJson(g));
+    var dedupe = ['chk', bu, tx, role, amount].join('|');
+    if (!matches.length) return { ok: true, result: 'REVIEW_REQUIRED', reason: 'No delegation of authority rule found for "' + role + '" in ' + bu + ' / ' + tx + '. Missing authority.', amount: amount, currency: 'SAR', dedupe_key: dedupe, business_unit: bu, transaction_type: tx, approver_role: role, entity: entity };
+    var active = matches.filter(function (m) { return m.effective; });
+    if (!active.length) return { ok: true, result: 'REVIEW_REQUIRED', reason: 'The authority for "' + role + '" is expired or inactive (rule ' + matches[0].number + ').', rule: matches[0], amount: amount, currency: 'SAR', dedupe_key: dedupe, business_unit: bu, transaction_type: tx, approver_role: role, entity: entity };
+    var limits = {}; active.forEach(function (m) { limits[m.approval_limit] = 1; });
+    if (Object.keys(limits).length > 1) return { ok: true, result: 'REVIEW_REQUIRED', reason: 'Conflicting/ambiguous authority: multiple active rules with different limits for "' + role + '".', rule: active[0], amount: amount, currency: 'SAR', dedupe_key: dedupe, business_unit: bu, transaction_type: tx, approver_role: role, entity: entity };
+    var rule = active[0];
+    if (amount <= rule.approval_limit) return { ok: true, result: 'COMPLIANT', reason: '"' + role + '" has sufficient authority (limit SAR ' + this._fmt(rule.approval_limit) + ') for SAR ' + this._fmt(amount) + '.', rule: rule, limit: rule.approval_limit, amount: amount, currency: rule.currency, source: { number: rule.number, sys_id: rule.sys_id, reference: rule.governing_reference }, dedupe_key: dedupe, business_unit: bu, transaction_type: tx, approver_role: role, entity: entity };
+    var next = null; var n = new GlideRecord(this.RULE); n.addQuery('business_unit', bu); n.addQuery('transaction_type', tx); n.orderBy('approval_limit'); n.query();
+    while (n.next()) { if (!this._isEffective(n)) continue; var nj = this._ruleJson(n); if (nj.approval_limit >= amount) { next = nj; break; } }
+    return { ok: true, result: 'OUTSIDE_AUTHORITY', reason: '"' + role + '" limit is SAR ' + this._fmt(rule.approval_limit) + ', but the request is SAR ' + this._fmt(amount) + '. Approval exceeds authority.', rule: rule, limit: rule.approval_limit, amount: amount, currency: rule.currency, source: { number: rule.number, sys_id: rule.sys_id, reference: rule.governing_reference }, next_approver: next ? { role: next.authority_role, limit: next.approval_limit, number: next.number, sys_id: next.sys_id } : (rule.escalation_authority ? { role: rule.escalation_authority } : null), dedupe_key: dedupe, business_unit: bu, transaction_type: tx, approver_role: role, entity: entity };
+  },
+  createDoAException: function (args) {
+    var dedupe = args.dedupe_key || '';
+    if (dedupe) { var dup = new GlideRecord(this.EXC); dup.addQuery('dedupe_key', dedupe); dup.addQuery('status', 'NOT IN', 'closed,dismissed'); dup.query(); if (dup.next()) return { ok: true, duplicate: true, sys_id: dup.getUniqueValue(), number: dup.getValue('number'), message: 'Existing open exception reused (no duplicate created).' }; }
+    var g = new GlideRecord(this.EXC); g.initialize(); g.setValue('number', this._num(this.EXC, 'DOAEX'));
+    var f = ['short_description','issue_type','doa_rule','policy','control','risk','publication','requirement','owner','priority','status','reason','suggested_correction','amount','transaction_type','business_unit','entity','approver_role','dedupe_key'];
+    for (var i = 0; i < f.length; i++) { if (args[f[i]] !== undefined && args[f[i]] !== null) g.setValue(f[i], args[f[i]]); }
+    if (!args.status) g.setValue('status', 'open');
+    if (!args.priority) g.setValue('priority', 'high');
+    g.setValue('is_demo', args.is_demo ? true : false);
+    var id = g.insert();
+    return { ok: true, sys_id: id, number: g.getValue('number') };
+  },
+  analyzeDoAConflicts: function (args) {
+    var findings = []; var g = new GlideRecord(this.RULE);
+    if (args.ruleId) g.addQuery('sys_id', args.ruleId); else g.addQuery('status', 'active');
+    g.query();
+    while (g.next()) {
+      var rule = this._ruleJson(g);
+      if (!rule.effective) findings.push(this._finding('expired_delegation', rule, null, null, null, 'Delegation ' + rule.number + ' (' + rule.authority_role + ') is expired/inactive yet still in the register.', 'Deactivate or renew the delegation and confirm the current authority holder.'));
+      if (rule.governing_policy) { var p = new GlideRecord(this.POLICY); if (p.get(rule.governing_policy) && p.getValue('reg_impacted') == '1') { findings.push(this._finding('policy_conflict', rule, { sys_id: p.getUniqueValue(), label: p.getValue('name') }, null, this._firstRiskForBU(rule.business_unit), 'Policy "' + p.getValue('name') + '" is flagged as impacted by a regulatory change; authority limits in ' + rule.number + ' may no longer align.', 'Run a DoA review against the updated policy and re-confirm the approval limit and escalation path.')); } }
+      var c = this._firstControlForBU(rule.business_unit);
+      if (c && c.effectiveness < 70) findings.push(this._finding('control_conflict', rule, null, { sys_id: c.sys_id, label: c.label }, this._firstRiskForBU(rule.business_unit), 'Approval control "' + c.label + '" for ' + rule.business_unit + ' is below target effectiveness (' + c.effectiveness + '%), weakening enforcement of ' + rule.number + '.', 'Strengthen the approval control and align its testing to the delegation limit.'));
+    }
+    return { ok: true, findings: findings, count: findings.length };
+  },
+  _finding: function (type, rule, policy, control, risk, explanation, correction) {
+    return { issue_type: type, doa_rule: { sys_id: rule.sys_id, number: rule.number, role: rule.authority_role, business_unit: rule.business_unit }, policy: policy, control: control, risk: risk, explanation: explanation, suggested_correction: correction, dedupe_key: ['conflict', type, rule.sys_id, policy ? policy.sys_id : '', control ? control.sys_id : ''].join('|') };
+  },
+  _firstControlForBU: function (bu) { var c = new GlideRecord(this.CONTROL); c.addQuery('business_unit', bu); c.orderBy('effectiveness'); c.setLimit(1); c.query(); if (c.next()) return { sys_id: c.getUniqueValue(), label: c.getValue('name'), effectiveness: parseInt(c.getValue('effectiveness') || '0', 10) }; return null; },
+  _firstRiskForBU: function (bu) { var r = new GlideRecord(this.RISK); r.addQuery('business_unit', bu); r.setLimit(1); r.query(); if (r.next()) return { sys_id: r.getUniqueValue(), label: r.getValue('name'), residual_score: parseInt(r.getValue('residual_score') || '0', 10) }; return null; },
+  saveDoAReview: function (args) {
+    var g = new GlideRecord(this.EXC);
+    if (!args.exceptionId || !g.get(args.exceptionId)) return { ok: false, error: 'Exception not found' };
+    if (args.decision) g.setValue('status', args.decision);
+    if (args.owner) g.setValue('owner', args.owner);
+    if (args.priority) g.setValue('priority', args.priority);
+    if (args.reviewer) g.setValue('reviewer', args.reviewer);
+    if (args.suggested_correction) g.setValue('suggested_correction', args.suggested_correction);
+    g.setValue('reviewed_on', new GlideDateTime().getValue()); g.update();
+    return { ok: true, sys_id: g.getUniqueValue(), status: g.getValue('status') };
+  },
+  createDoATask: function (args) {
+    var g = new GlideRecord(this.EXC);
+    if (!args.exceptionId || !g.get(args.exceptionId)) return { ok: false, error: 'Exception not found' };
+    var st = '' + g.getValue('status');
+    if (st === 'open') return { ok: false, error: 'Confirm (Review/Accept) the exception before creating a remediation task.' };
+    if (g.getValue('task')) { var ex = new GlideRecord(this.ACTION); if (ex.get(g.getValue('task'))) return { ok: true, duplicate: true, task_sys_id: ex.getUniqueValue(), task_number: ex.getValue('task_number'), message: 'Task already exists for this exception.' }; }
+    var a = new GlideRecord(this.ACTION); a.initialize(); var tnum = this._num(this.ACTION, 'DOACT');
+    a.setValue('task_number', tnum);
+    a.setValue('short_description', args.short_description || ('Remediate DoA exception ' + g.getValue('number') + ': ' + g.getValue('short_description')));
+    a.setValue('description', (g.getValue('reason') || '') + String.fromCharCode(10) + String.fromCharCode(10) + 'Suggested correction: ' + (g.getValue('suggested_correction') || '-'));
+    a.setValue('priority', args.priority || g.getValue('priority') || 'high');
+    a.setValue('status', 'open');
+    a.setValue('assigned_to', args.assigned_to || g.getValue('owner') || '');
+    a.setValue('business_unit', g.getValue('business_unit') || '');
+    if (g.getValue('publication')) a.setValue('publication', g.getValue('publication'));
+    if (g.getValue('requirement')) a.setValue('requirement', g.getValue('requirement'));
+    if (args.due_date) a.setValue('due_date', args.due_date);
+    var tid = a.insert();
+    g.setValue('task', tid); if (st !== 'closed') g.setValue('status', 'in_review'); g.update();
+    return { ok: true, task_sys_id: tid, task_number: tnum, exception: g.getValue('number') };
+  },
+  getDoAKpis: function (args) {
+    function count(table, q) { var a = new GlideRecord(table); if (q) a.addEncodedQuery(q); a.query(); return a.getRowCount(); }
+    var t = this._today();
+    return { ok: true, kpis: {
+      doa_rules_total: count(this.RULE, ''),
+      doa_rules_active: count(this.RULE, 'status=active'),
+      expired_delegations: count(this.RULE, 'status=expired^OReffective_toLESSTHAN' + t),
+      exceptions_open: count(this.EXC, 'statusNOT IN closed,dismissed'),
+      outside_authority: count(this.EXC, 'issue_type=limit_violation^statusNOT IN closed,dismissed'),
+      conflicts_open: count(this.EXC, 'issue_typeIN policy_conflict,control_conflict^statusNOT IN closed,dismissed'),
+      tasks_open: count(this.EXC, 'taskISNOTEMPTY^statusNOT IN closed,dismissed'),
+      exceptions_closed: count(this.EXC, 'statusIN closed,dismissed')
+    } };
+  },
+  type: 'DoAIntelligence'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-19 14:04:50</sys_created_on>
+        <sys_id>c28fe6830033491896d891651103c39a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>DoAIntelligence</sys_name>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sys_script_include_c28fe6830033491896d891651103c39a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-19 14:04:50</sys_updated_on>
+    </sys_script_include>
+</record_update>

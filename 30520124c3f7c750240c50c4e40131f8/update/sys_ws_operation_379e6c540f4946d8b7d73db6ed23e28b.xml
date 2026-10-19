@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json,application/xml,text/xml</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri/>
+        <enforce_acl/>
+        <http_method>POST</http_method>
+        <name>Execute (POST)</name>
+        <operation_script><![CDATA[(function process(request, response){
+  var api = new x_snc_se_grc_vp_0.DoAIntelligence();
+  var op, args = {};
+  try { var data = request.body ? request.body.data : null; if (data) { op = data.op; args = data.args || {}; } } catch(e){}
+  if (!op) { op = request.queryParams.op ? ''+request.queryParams.op : null; }
+  if (!op) return { ok:false, error:'Missing op. POST {op, args}.' };
+  return api.process(op, args);
+})(request, response);]]></operation_script>
+        <operation_uri>/api/x_snc_se_grc_vp_0/doa/v1/execute</operation_uri>
+        <produces>application/json,application/xml,text/xml</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/v1/execute</relative_path>
+        <request_example/>
+        <requires_acl_authorization>false</requires_acl_authorization>
+        <requires_authentication>true</requires_authentication>
+        <requires_snc_internal_role>true</requires_snc_internal_role>
+        <short_description/>
+        <support_trailing_slash>false</support_trailing_slash>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-19 14:04:53</sys_created_on>
+        <sys_id>379e6c540f4946d8b7d73db6ed23e28b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Execute (POST)</sys_name>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sys_ws_operation_379e6c540f4946d8b7d73db6ed23e28b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-19 14:04:53</sys_updated_on>
+        <web_service_definition display_value="DoA Intelligence API">f824a95fb7e54f7b87429ef5131b77a6</web_service_definition>
+        <web_service_version/>
+    </sys_ws_operation>
+</record_update>
