@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script/>
+        <description>Delegation of Authority Intelligence — Authority Matrix, Ask DoA AI, Approval Checker, Exceptions &amp; Conflicts.</description>
+        <direct>true</direct>
+        <endpoint>x_snc_se_grc_vp_0_doa_intelligence.do</endpoint>
+        <html><![CDATA[
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>DoA Intelligence</title>
+<style>
+.grc-light{--grc-bg:240,243,247;--grc-surface:255,255,255;--grc-surface2:247,249,252;--grc-raised:255,255,255;--grc-sunken:247,249,252;--grc-border:222,228,236;--grc-text:18,28,42;--grc-muted:82,96,118;--grc-faint:130,144,165;--grc-primary:0,113,188;--grc-ai:124,92,219;--grc-crit:214,48,49;--grc-high:201,123,0;--grc-healthy:30,150,90;}
+:root{--grc-bg:15,20,32;--grc-surface:23,30,46;--grc-surface2:30,39,59;--grc-raised:34,44,66;--grc-sunken:11,21,38;--grc-border:44,56,82;--grc-text:232,237,245;--grc-muted:148,163,193;--grc-faint:108,122,150;--grc-primary:56,139,253;--grc-ai:167,139,250;--grc-crit:248,81,73;--grc-high:245,158,11;--grc-healthy:46,204,113;}
+html,body{margin:0;padding:0;background:rgb(var(--grc-bg));color:rgb(var(--grc-text));font-family:"Lato",-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px}
+[dir="rtl"]{text-align:right}
+.themebtn{position:fixed;top:14px;right:16px;z-index:60;background:rgb(var(--grc-surface2));color:rgb(var(--grc-text));border:1px solid rgb(var(--grc-border));border-radius:7px;padding:6px 11px;font-size:12px;cursor:pointer}
+.wrap{max-width:1280px;margin:0 auto;padding:18px 22px 60px}
+.hdr{border-bottom:1px solid rgb(var(--grc-border));padding-bottom:14px;margin-bottom:14px}
+.crumb{color:rgb(var(--grc-faint));font-size:12px;margin-bottom:6px}
+.crumb b{color:rgb(var(--grc-muted))}
+.h1{font-size:20px;font-weight:700}
+.sub{color:rgb(var(--grc-muted));font-size:12px;margin-top:3px}
+.back{color:rgb(var(--grc-primary));text-decoration:none;font-size:12px;display:inline-block;margin-bottom:8px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:rgb(var(--grc-surface2));border:1px solid rgb(var(--grc-border));border-radius:9px;padding:12px}
+.kpi .v{font-size:22px;font-weight:700;color:rgb(var(--grc-text))}
+.kpi .l{font-size:11px;color:rgb(var(--grc-muted));margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+.kpi .src{font-size:9px;color:rgb(var(--grc-ai));margin-top:4px;text-transform:uppercase;letter-spacing:.3px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid rgb(var(--grc-border));margin-bottom:14px;flex-wrap:wrap}
+.tab{padding:8px 13px;font-size:13px;color:rgb(var(--grc-muted));cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:rgb(var(--grc-primary));border-bottom-color:rgb(var(--grc-ai));font-weight:600}
+.panel{background:rgb(var(--grc-surface));border:1px solid rgb(var(--grc-border));border-radius:10px;padding:14px;margin-bottom:12px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.btn{background:rgb(var(--grc-surface2));color:rgb(var(--grc-text));border:1px solid rgb(var(--grc-border));border-radius:7px;padding:8px 13px;font-size:13px;cursor:pointer}
+.btn:hover{border-color:rgb(var(--grc-primary))}
+.btn.primary{background:rgb(var(--grc-primary));border-color:rgb(var(--grc-primary));color:#fff}
+.btn.ai{background:rgb(var(--grc-ai));border-color:rgb(var(--grc-ai));color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.mini{font-size:12px;padding:4px 9px;border-radius:6px;border:1px solid rgb(var(--grc-border));background:rgb(var(--grc-surface2));color:rgb(var(--grc-text));cursor:pointer;margin-left:5px}
+.mini.a{border-color:#10b981;color:#34d399}
+.mini.m{border-color:#f59e0b;color:#fbbf24}
+.mini.r{border-color:#ef4444;color:#f87171}
+.mini.p{border-color:rgb(var(--grc-primary));color:rgb(var(--grc-primary))}
+table.grid{width:100%;border-collapse:collapse;font-size:12.5px}
+table.grid th{text-align:left;color:rgb(var(--grc-muted));font-size:11px;text-transform:uppercase;letter-spacing:.3px;padding:7px 8px;border-bottom:1px solid rgb(var(--grc-border))}
+table.grid td{padding:8px;border-bottom:1px solid rgb(var(--grc-border));color:rgb(var(--grc-text));vertical-align:top}
+table.grid tr:hover td{background:rgb(var(--grc-surface2))}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.pill.active,.pill.compliant,.pill.accepted,.pill.closed{background:#07331f;color:#34d399;border:1px solid #10b981}
+.pill.expired,.pill.outside_authority,.pill.rejected,.pill.dismissed,.pill.high,.pill.critical{background:#3a0d0d;color:#f87171;border:1px solid #ef4444}
+.pill.review_required,.pill.medium,.pill.modified,.pill.in_review,.pill.inactive{background:#3a2a06;color:#fbbf24;border:1px solid #f59e0b}
+.pill.open,.pill.low,.pill.policy_conflict,.pill.control_conflict,.pill.expired_delegation,.pill.limit_violation{background:#0d2440;color:#7fb0ff;border:1px solid rgb(var(--grc-primary))}
+.frm{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.fld label{font-size:11px;color:rgb(var(--grc-muted));text-transform:uppercase;letter-spacing:.3px}
+.fld input,.fld select,.fld textarea{background:rgb(var(--grc-sunken));color:rgb(var(--grc-text));border:1px solid rgb(var(--grc-border));border-radius:7px;padding:8px;font-size:13px;box-sizing:border-box;width:100%}
+.full{grid-column:1 / -1}
+.result{border-radius:9px;padding:14px;margin-top:12px;border:1px solid rgb(var(--grc-border));background:rgb(var(--grc-surface2))}
+.result.compliant{border-left:4px solid #10b981}
+.result.outside_authority{border-left:4px solid #ef4444}
+.result.review_required{border-left:4px solid #f59e0b}
+.result .rt{font-size:16px;font-weight:700}
+.result .rt.compliant{color:#34d399}.result .rt.outside_authority{color:#f87171}.result .rt.review_required{color:#fbbf24}
+.kv{font-size:12.5px;color:rgb(var(--grc-muted));margin:4px 0}
+.kv b{color:rgb(var(--grc-text))}
+.row{border:1px solid rgb(var(--grc-border));border-radius:8px;padding:11px;margin-bottom:9px;background:rgb(var(--grc-surface2))}
+.row .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.row .ttl{font-weight:600;color:rgb(var(--grc-text));font-size:13px}
+.row .meta{font-size:12px;color:rgb(var(--grc-muted));margin-top:5px;line-height:1.5}
+.chain{font-size:12px;color:rgb(var(--grc-muted));margin-top:6px}
+.chain b{color:rgb(var(--grc-ai))}
+.empty{color:rgb(var(--grc-faint));font-size:13px;padding:20px;text-align:center}
+.ans{background:rgb(var(--grc-surface2));border:1px solid rgb(var(--grc-border));border-left:3px solid rgb(var(--grc-ai));border-radius:8px;padding:12px;margin-top:10px;line-height:1.6}
+.demo{display:inline-block;background:#3a2a06;color:#fbbf24;border:1px solid #f59e0b;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:600;margin-left:6px}
+.modal{position:fixed;inset:0;background:rgba(5,10,20,.65);display:none;align-items:flex-start;justify-content:center;z-index:50;overflow:auto}
+.modal.open{display:flex}
+.modal .box{background:rgb(var(--grc-surface));border:1px solid rgb(var(--grc-border));border-radius:10px;padding:18px;width:680px;max-width:94vw;margin-top:50px}
+.modal h3{margin:0 0 12px;color:rgb(var(--grc-text))}
+.toast{position:fixed;bottom:20px;right:20px;background:rgb(var(--grc-raised));border:1px solid rgb(var(--grc-primary));color:rgb(var(--grc-text));padding:12px 16px;border-radius:8px;max-width:420px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:99;display:none}
+.toast.err{border-color:#ef4444}
+.spin{color:rgb(var(--grc-primary));font-size:12px}
+</style>
+</head>
+<body class="grc-light">
+<button id="themeBtn" class="themebtn" onclick="toggleTheme()">◑ Theme</button>
+<div class="wrap">
+  <div class="hdr">
+    <a class="back" href="/x_snc_se_grc_vp_0_command_center.do?tab=governance">← Back to Command Center</a>
+    <div class="crumb">GRC VP Command Center › Governance & Policy › <b>DoA Intelligence</b></div>
+    <div class="h1">Delegation of Authority Intelligence</div>
+    <div class="sub">Digitized approval authorities, AI authority inquiry, deterministic approval checks, and connected GRC exceptions · Saudi Energy (DEMO)</div>
+  </div>
+  <div class="cards" id="kpiStrip"></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="tabBody"><div class="empty spin">Loading…</div></div>
+</div>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>window.DOA_CK="$[gs.getSession().getSessionToken() || gs.getSessionToken()]";</script>
+<script>
+var BASE='/api/x_snc_se_grc_vp_0/doa/v1/execute';
+var TABS=['Authority Matrix','Ask DoA AI','Approval Checker','Exceptions & Conflicts'];
+var S={tab:'Authority Matrix',rules:[],exceptions:[],check:null,findings:[]};
+
+function applyTheme(t){try{document.body.classList.remove('grc-light');if(t==='light'){document.body.classList.add('grc-light');}localStorage.setItem('grcTheme',t);var b=document.getElementById('themeBtn');if(b){b.innerHTML=(t==='light'?'◑ Dark':'◐ Light');}}catch(e){}}
+function toggleTheme(){var cur=(localStorage.getItem('grcTheme')||'light');applyTheme(cur==='light'?'dark':'light');}
+(function(){var q=(location.search||'');var m=q.match(/theme=(light|dark)/);applyTheme(m?m[1]:(localStorage.getItem('grcTheme')||'light'));})();
+
+function esc(s){s=(s==null?'':''+s);return s.split('&').join('&').split('<').join('&lt;').split('>').join('&gt;');}
+function isAr(s){s=''+(s||'');for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c>=1536&&c<=1791)return true;}return false;}
+function dir(s){return isAr(s)?' dir="rtl"':'';}
+function toast(m,err){var t=document.getElementById('toast');t.textContent=m;t.className='toast'+(err?' err':'');t.style.display='block';setTimeout(function(){t.style.display='none';},err?6000:3500);}
+function pill(v){var c=(''+(v||'')).toLowerCase().split(' ').join('_');return '<span class="pill '+c+'">'+esc(v)+'</span>';}
+function fmt(n){n=parseFloat(n)||0;try{return n.toLocaleString('en-US');}catch(e){return ''+n;}}
+function call(op,args){return fetch(BASE,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json','X-UserToken':window.DOA_CK},body:JSON.stringify({op:op,args:args||{}})}).then(function(r){return r.json();}).then(function(j){var d=(j&&j.result)?j.result:j;if(d&&d.ok===false)toast(d.error||'Operation failed',true);return d;}).catch(function(e){toast('Network error: '+e,true);return {ok:false,error:''+e};});}
+
+function openModal(h){document.getElementById('modalBox').innerHTML=h;document.getElementById('modal').className='modal open';}
+function closeModal(){document.getElementById('modal').className='modal';}
+
+function renderTabs(){var h='';for(var i=0;i<TABS.length;i++){h+='<div class="tab'+(TABS[i]===S.tab?' active':'')+'" onclick="setTab(\''+TABS[i]+'\')">'+TABS[i]+'</div>';}document.getElementById('tabs').innerHTML=h;}
+function setTab(t){S.tab=t;renderTabs();renderBody();}
+
+function loadKpis(){call('getDoAKpis',{}).then(function(d){if(!d||!d.kpis){return;}var k=d.kpis;var defs=[['doa_rules_active','Active DoA Rules'],['expired_delegations','Expired Delegations'],['exceptions_open','Open Exceptions'],['outside_authority','Outside Authority'],['conflicts_open','Open Conflicts'],['tasks_open','Remediation Tasks']];var h='';for(var i=0;i<defs.length;i++){h+='<div class="kpi"><div class="v">'+(k[defs[i][0]]!=null?k[defs[i][0]]:0)+'</div><div class="l">'+defs[i][1]+'</div><div class="src">Live DoA</div></div>';}document.getElementById('kpiStrip').innerHTML=h;});}
+
+function renderBody(){
+  if(S.tab==='Authority Matrix')return renderMatrix();
+  if(S.tab==='Ask DoA AI')return renderAsk();
+  if(S.tab==='Approval Checker')return renderChecker();
+  if(S.tab==='Exceptions & Conflicts')return renderExceptions();
+}
+
+/* ---------- Authority Matrix ---------- */
+function renderMatrix(){
+  var el=document.getElementById('tabBody');
+  el.innerHTML='<div class="panel"><div class="toolbar">'+
+    '<button class="btn primary" onclick="ruleForm()">+ Add Rule</button>'+
+    '<button class="btn" onclick="importForm()">Import CSV</button>'+
+    '<button class="btn" onclick="loadMatrix()">Refresh</button>'+
+    '</div><div id="matrixGrid"><div class="empty spin">Loading rules…</div></div></div>';
+  loadMatrix();
+}
+function loadMatrix(){
+  call('listDoARules',{}).then(function(d){S.rules=(d&&d.rules)||[];var g=document.getElementById('matrixGrid');if(!g)return;
+    if(!S.rules.length){g.innerHTML='<div class="empty">No DoA rules. Add one or Import CSV.</div>';return;}
+    var h='<table class="grid"><thead><tr><th>Number</th><th>Entity / BU / Dept</th><th>Authority Role</th><th>Transaction</th><th>Limit (SAR)</th><th>Effective</th><th>Status</th><th>Source</th><th></th></tr></thead><tbody>';
+    for(var i=0;i<S.rules.length;i++){var r=S.rules[i];
+      h+='<tr><td><b>'+esc(r.number)+'</b>'+(r.is_demo?'<span class="demo">DEMO</span>':'')+'</td>'+
+        '<td'+dir(r.entity)+'>'+esc(r.entity)+'<div class="kv">'+esc(r.business_unit)+' / '+esc(r.department)+'</div></td>'+
+        '<td'+dir(r.authority_role)+'>'+esc(r.authority_role)+(r.holder?'<div class="kv">'+esc(r.holder)+'</div>':'')+'</td>'+
+        '<td>'+esc(r.transaction_type)+'</td>'+
+        '<td><b>'+fmt(r.approval_limit)+'</b></td>'+
+        '<td class="kv">'+esc(r.effective_from||'-')+'<br>'+esc(r.effective_to||'-')+'</td>'+
+        '<td>'+pill(r.status)+'</td>'+
+        '<td class="kv"'+dir(r.governing_reference)+'>'+esc(r.governing_reference||'-')+'</td>'+
+        '<td style="white-space:nowrap"><button class="mini p" onclick="ruleForm(\''+r.sys_id+'\')">Edit</button>'+
+        '<button class="mini '+(r.status==='active'?'r':'a')+'" onclick="toggleRule(\''+r.sys_id+'\',\''+(r.status==='active'?'inactive':'active')+'\')">'+(r.status==='active'?'Deactivate':'Activate')+'</button>'+
+        '<button class="mini" onclick="viewSource(\''+r.sys_id+'\')">View Source</button></td></tr>';
+    }
+    h+='</tbody></table>';g.innerHTML=h;
+  });
+}
+function ruleField(id,lbl,val,type){val=val==null?'':(''+val);if(type==='area')return '<div class="fld full"><label>'+lbl+'</label><textarea id="'+id+'"'+dir(val)+'>'+esc(val)+'</textarea></div>';return '<div class="fld"><label>'+lbl+'</label><input id="'+id+'" value="'+esc(val)+'"'+dir(val)+'/></div>';}
+function ruleForm(id){
+  var r={};if(id){for(var i=0;i<S.rules.length;i++)if(S.rules[i].sys_id===id)r=S.rules[i];}
+  var h='<h3>'+(id?'Edit':'Add')+' DoA Rule</h3><div class="frm">'+
+    ruleField('f_entity','Entity',r.entity)+ruleField('f_bu','Business Unit',r.business_unit)+
+    ruleField('f_dept','Department',r.department)+ruleField('f_role','Authority Role',r.authority_role)+
+    ruleField('f_holder','Holder (optional)',r.holder)+ruleField('f_tx','Transaction Type',r.transaction_type)+
+    ruleField('f_limit','Approval Limit',r.approval_limit)+ruleField('f_cur','Currency',r.currency||'SAR')+
+    ruleField('f_esc','Escalation Authority',r.escalation_authority)+ruleField('f_ver','Version',r.version||'1.0')+
+    ruleField('f_from','Effective From (yyyy-mm-dd)',r.effective_from)+ruleField('f_to','Effective To (yyyy-mm-dd)',r.effective_to)+
+    '<div class="fld"><label>Status</label><select id="f_status"><option value="active"'+(r.status!=='inactive'&&r.status!=='expired'?' selected':'')+'>active</option><option value="inactive"'+(r.status==='inactive'?' selected':'')+'>inactive</option><option value="expired"'+(r.status==='expired'?' selected':'')+'>expired</option></select></div>'+
+    ruleField('f_ref','Governing Reference',r.governing_reference)+
+    ruleField('f_cond','Conditions',r.conditions,'area')+
+    '</div><div style="text-align:right;margin-top:12px"><button class="btn" onclick="closeModal()">Cancel</button> <button class="btn primary" onclick="saveRule(\''+(id||'')+'\')">Save</button></div>';
+  openModal(h);
+}
+function val(id){var e=document.getElementById(id);return e?e.value:'';}
+function saveRule(id){
+  var rule={entity:val('f_entity'),business_unit:val('f_bu'),department:val('f_dept'),authority_role:val('f_role'),holder:val('f_holder'),transaction_type:val('f_tx'),approval_limit:parseFloat(val('f_limit'))||0,currency:val('f_cur'),escalation_authority:val('f_esc'),version:val('f_ver'),effective_from:val('f_from'),effective_to:val('f_to'),status:val('f_status'),governing_reference:val('f_ref'),conditions:val('f_cond')};
+  if(id)rule.sys_id=id;
+  call('saveDoARule',{rule:rule}).then(function(d){if(d&&d.ok){toast('Saved '+(d.number||''));closeModal();loadMatrix();loadKpis();}});
+}
+function toggleRule(id,st){call('setRuleStatus',{sys_id:id,status:st}).then(function(d){if(d&&d.ok){toast('Status: '+d.status);loadMatrix();loadKpis();}});}
+function viewSource(id){window.open('/x_snc_se_grc_vp_0_doa_rule.do?sys_id='+id,'_blank');}
+function importForm(){
+  var sample='entity,business_unit,department,authority_role,holder,transaction_type,approval_limit,currency,escalation_authority,effective_from,effective_to,status,version,governing_reference';
+  openModal('<h3>Import DoA Rules (CSV)</h3><div class="kv">First row must be headers. Imported rows are flagged DEMO.</div>'+
+    '<div class="fld full"><label>CSV</label><textarea id="csvBox" style="height:160px" placeholder="'+sample+'">'+sample+'</textarea></div>'+
+    '<div style="text-align:right;margin-top:12px"><button class="btn" onclick="closeModal()">Cancel</button> <button class="btn primary" onclick="doImport()">Import</button></div>');
+}
+function doImport(){var csv=val('csvBox');call('importDoARules',{csv:csv}).then(function(d){if(d&&d.ok){toast('Imported '+d.created+' rule(s)');closeModal();loadMatrix();loadKpis();}});}
+
+/* ---------- Ask DoA AI ---------- */
+function renderAsk(){
+  var el=document.getElementById('tabBody');
+  el.innerHTML='<div class="panel"><div class="fld full"><label>Ask an authority question (English or العربية)</label>'+
+    '<textarea id="askBox" style="height:70px" placeholder="Who can approve a SAR 750,000 procurement request in Operations?"></textarea></div>'+
+    '<div class="toolbar"><button class="btn ai" onclick="doAsk()">Ask DoA AI</button>'+
+    '<button class="btn" onclick="document.getElementById(\'askBox\').value=\'Who can approve a SAR 750,000 procurement request in Operations?\'">EN example</button>'+
+    '<button class="btn" onclick="document.getElementById(\'askBox\').value=\'من يعتمد طلب شراء بقيمة 750000 ريال في العمليات؟\'">مثال عربي</button></div>'+
+    '<div id="askOut"></div></div>';
+}
+function doAsk(){
+  var q=val('askBox');if(!q){toast('Type a question',true);return;}
+  document.getElementById('askOut').innerHTML='<div class="empty spin">Retrieving authority rules…</div>';
+  call('askDoA',{question:q}).then(function(d){
+    var o=document.getElementById('askOut');if(!d){o.innerHTML='';return;}
+    if(d.clarify){o.innerHTML='<div class="ans"'+dir(d.message)+'><b>ℹ️</b> '+esc(d.message)+'</div>';return;}
+    var h='<div class="ans"'+dir(d.answer)+'>'+esc(d.answer)+'</div>';
+    if(d.authorized_role){h+='<div class="result"><div class="kv"><b>Authorized role:</b> '+esc(d.authorized_role)+'</div>'+
+      '<div class="kv"><b>Approval threshold:</b> SAR '+fmt(d.approval_threshold)+'</div>'+
+      '<div class="kv"><b>Escalation:</b> '+esc(d.escalation||'-')+'</div>'+
+      (d.conditions?'<div class="kv"'+dir(d.conditions)+'><b>Conditions:</b> '+esc(d.conditions)+'</div>':'')+
+      '<div class="kv"><b>Source:</b> '+esc(d.source?d.source.number:'-')+' · '+esc(d.source?d.source.reference:'')+'</div></div>';}
+    o.innerHTML=h;
+  });
+}
+
+/* ---------- Approval Checker ---------- */
+function renderChecker(){
+  var el=document.getElementById('tabBody');
+  el.innerHTML='<div class="panel"><div class="frm">'+
+    '<div class="fld"><label>Entity</label><input id="c_entity" value="Saudi Energy Co. (DEMO)"/></div>'+
+    '<div class="fld"><label>Business Unit</label><input id="c_bu" value="Procurement"/></div>'+
+    '<div class="fld"><label>Transaction Type</label><input id="c_tx" value="Procurement"/></div>'+
+    '<div class="fld"><label>Amount (SAR)</label><input id="c_amt" value="750000"/></div>'+
+    '<div class="fld"><label>Approver Role</label><input id="c_role" value="Procurement Manager"/></div>'+
+    '<div class="fld" style="justify-content:flex-end"><button class="btn primary" onclick="doCheck()">Check Authority</button></div>'+
+    '</div><div id="checkOut"></div></div>';
+  if(S.check)renderCheckResult(S.check);
+}
+function doCheck(){
+  var args={entity:val('c_entity'),business_unit:val('c_bu'),transaction_type:val('c_tx'),amount:parseFloat(val('c_amt'))||0,approver_role:val('c_role')};
+  document.getElementById('checkOut').innerHTML='<div class="empty spin">Checking…</div>';
+  call('checkAuthority',args).then(function(d){if(!d){return;}S.check=d;renderCheckResult(d);});
+}
+function renderCheckResult(d){
+  var o=document.getElementById('checkOut');if(!o)return;
+  var cls=(''+d.result).toLowerCase();
+  var label=d.result==='OUTSIDE_AUTHORITY'?'OUTSIDE AUTHORITY':(d.result==='REVIEW_REQUIRED'?'REVIEW REQUIRED':'COMPLIANT');
+  var h='<div class="result '+cls+'"><div class="rt '+cls+'">'+label+'</div>'+
+    '<div class="kv"'+dir(d.reason)+'>'+esc(d.reason)+'</div>';
+  if(d.rule){h+='<div class="kv"><b>Applicable rule:</b> '+esc(d.rule.number)+' — '+esc(d.rule.authority_role)+' (limit SAR '+fmt(d.rule.approval_limit)+')</div>';}
+  if(d.amount){h+='<div class="kv"><b>Requested:</b> SAR '+fmt(d.amount)+'</div>';}
+  if(d.source){h+='<div class="kv"><b>Source:</b> '+esc(d.source.number)+' · '+esc(d.source.reference||'')+'</div>';}
+  if(d.next_approver){h+='<div class="kv"><b>Suggested next approver:</b> '+esc(d.next_approver.role)+(d.next_approver.limit?(' (limit SAR '+fmt(d.next_approver.limit)+', '+esc(d.next_approver.number)+')'):'')+'</div>';}
+  if(d.result==='OUTSIDE_AUTHORITY'||d.result==='REVIEW_REQUIRED'){
+    h+='<div style="margin-top:10px"><button class="btn primary" onclick="createExcFromCheck()">Create Exception</button> <span class="kv">Does not approve/reject the transaction.</span></div>';
+  }
+  h+='</div>';o.innerHTML=h;
+}
+function createExcFromCheck(){
+  var d=S.check;if(!d){return;}
+  var issue=d.result==='OUTSIDE_AUTHORITY'?'limit_violation':'missing_authority';
+  var sd=(d.result==='OUTSIDE_AUTHORITY'?'Outside authority: ':'Review required: ')+d.approver_role+' / '+d.business_unit+' / '+d.transaction_type+' SAR '+fmt(d.amount);
+  var args={short_description:sd,issue_type:issue,reason:d.reason,amount:d.amount,transaction_type:d.transaction_type,business_unit:d.business_unit,entity:d.entity,approver_role:d.approver_role,priority:'high',dedupe_key:d.dedupe_key,owner:'poc.reviewer'};
+  if(d.rule&&d.rule.sys_id)args.doa_rule=d.rule.sys_id;
+  call('createDoAException',args).then(function(r){if(r&&r.ok){toast(r.duplicate?('Existing exception reused: '+r.number):('Exception created: '+r.number));loadKpis();}});
+}
+
+/* ---------- Exceptions & Conflicts ---------- */
+function renderExceptions(){
+  var el=document.getElementById('tabBody');
+  el.innerHTML='<div class="panel"><div class="toolbar">'+
+    '<button class="btn ai" onclick="doAnalyze()">Analyze Conflicts</button>'+
+    '<button class="btn" onclick="loadExceptions()">Refresh Queue</button></div>'+
+    '<div id="findings"></div><div id="excQueue"><div class="empty spin">Loading queue…</div></div></div>';
+  loadExceptions();
+}
+function loadExceptions(){
+  call('listDoAExceptions',{}).then(function(d){S.exceptions=(d&&d.exceptions)||[];var q=document.getElementById('excQueue');if(!q)return;
+    if(!S.exceptions.length){q.innerHTML='<div class="empty">No exceptions yet. Run the Approval Checker or Analyze Conflicts.</div>';return;}
+    var h='';
+    for(var i=0;i<S.exceptions.length;i++){var e=S.exceptions[i];
+      var chain='<div class="chain"><b>Issue:</b> '+pill(e.issue_type)+' → <b>DoA:</b> '+esc(e.rule_label||e.doa_rule||'-')+' → <b>Policy/Control:</b> '+esc(e.policy_label||e.control_label||'-')+' → <b>Risk:</b> '+esc(e.risk_label||'-')+(e.publication_label?(' → <b>Reg:</b> '+esc(e.publication_label)):'')+'</div>';
+      var actions='<button class="mini p" onclick="excReview(\''+e.sys_id+'\',\'reviewed\')">Review</button>'+
+        '<button class="mini a" onclick="excReview(\''+e.sys_id+'\',\'accepted\')">Accept</button>'+
+        '<button class="mini m" onclick="excReview(\''+e.sys_id+'\',\'modified\')">Modify</button>'+
+        '<button class="mini r" onclick="excReview(\''+e.sys_id+'\',\'dismissed\')">Dismiss</button>'+
+        '<button class="mini p" onclick="excTask(\''+e.sys_id+'\')">Create Task</button>'+
+        '<button class="mini" onclick="excReview(\''+e.sys_id+'\',\'closed\')">Close</button>';
+      h+='<div class="row"><div class="top"><div class="ttl"'+dir(e.short_description)+'>'+esc(e.number)+' · '+esc(e.short_description)+(e.is_demo?'<span class="demo">DEMO</span>':'')+'</div><div>'+pill(e.priority)+' '+pill(e.status)+'</div></div>'+
+        chain+
+        (e.reason?'<div class="meta"'+dir(e.reason)+'><b>Reason:</b> '+esc(e.reason)+'</div>':'')+
+        (e.suggested_correction?'<div class="meta"'+dir(e.suggested_correction)+'><b>Suggested:</b> '+esc(e.suggested_correction)+'</div>':'')+
+        (e.task_number?'<div class="meta"><b>Task:</b> '+esc(e.task_number)+'</div>':'')+
+        (e.owner?'<div class="meta"><b>Owner:</b> '+esc(e.owner)+(e.reviewer?(' · Reviewer: '+esc(e.reviewer)):'')+'</div>':'')+
+        '<div style="margin-top:8px">'+actions+'</div></div>';
+    }
+    q.innerHTML=h;
+  });
+}
+function excReview(id,decision){call('saveDoAReview',{exceptionId:id,decision:decision,reviewer:'poc.reviewer'}).then(function(d){if(d&&d.ok){toast('Exception '+decision);loadExceptions();loadKpis();}});}
+function excTask(id){call('createDoATask',{exceptionId:id,assigned_to:'poc.remediation'}).then(function(d){if(d&&d.ok){toast(d.duplicate?('Task already exists: '+d.task_number):('Task created: '+d.task_number));loadExceptions();loadKpis();}});}
+function doAnalyze(){
+  document.getElementById('findings').innerHTML='<div class="empty spin">Analyzing DoA vs policy/control/risk…</div>';
+  call('analyzeDoAConflicts',{}).then(function(d){S.findings=(d&&d.findings)||[];var f=document.getElementById('findings');
+    if(!S.findings.length){f.innerHTML='<div class="row"><div class="meta">No conflicts detected across active delegations.</div></div>';return;}
+    var h='<div class="panel" style="border-left:3px solid rgb(var(--grc-ai))"><div class="ttl">AI-assisted conflict findings ('+S.findings.length+') — reviewer must confirm before remediation</div>';
+    for(var i=0;i<S.findings.length;i++){var x=S.findings[i];window['_find'+i]=x;
+      h+='<div class="row"><div class="top"><div class="ttl">'+pill(x.issue_type)+' '+esc(x.doa_rule.number)+' · '+esc(x.doa_rule.role)+'</div></div>'+
+        '<div class="chain"><b>DoA:</b> '+esc(x.doa_rule.number)+(x.policy?(' → <b>Policy:</b> '+esc(x.policy.label)):'')+(x.control?(' → <b>Control:</b> '+esc(x.control.label)):'')+(x.risk?(' → <b>Risk:</b> '+esc(x.risk.label)):'')+'</div>'+
+        '<div class="meta">'+esc(x.explanation)+'</div>'+
+        '<div class="meta"><b>Suggested correction:</b> '+esc(x.suggested_correction)+'</div>'+
+        '<div style="margin-top:8px"><button class="mini a" onclick="confirmFinding('+i+')">Confirm Finding → Create Exception</button></div></div>';
+    }
+    h+='</div>';f.innerHTML=h;
+  });
+}
+function confirmFinding(i){
+  var x=window['_find'+i];if(!x){return;}
+  var args={short_description:'Conflict: '+x.doa_rule.number+' '+x.issue_type,issue_type:x.issue_type,reason:x.explanation,suggested_correction:x.suggested_correction,doa_rule:x.doa_rule.sys_id,priority:'high',owner:'poc.reviewer',status:'reviewed',dedupe_key:x.dedupe_key};
+  if(x.policy)args.policy=x.policy.sys_id;
+  if(x.control)args.control=x.control.sys_id;
+  if(x.risk)args.risk=x.risk.sys_id;
+  call('createDoAException',args).then(function(r){if(r&&r.ok){toast(r.duplicate?('Existing exception reused: '+r.number):('Exception created: '+r.number));loadExceptions();loadKpis();}});
+}
+
+renderTabs();loadKpis();renderBody();
+</script>
+</body>
+</html>
+]]></html>
+        <name>doa_intelligence</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-20 12:05:08</sys_created_on>
+        <sys_id>0147f4425b834119874037d8afa96dc7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>doa_intelligence</sys_name>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sys_ui_page_0147f4425b834119874037d8afa96dc7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-20 12:05:08</sys_updated_on>
+    </sys_ui_page>
+</record_update>
