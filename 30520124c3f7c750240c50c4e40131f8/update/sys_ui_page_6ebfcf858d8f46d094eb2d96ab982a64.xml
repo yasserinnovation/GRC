@@ -111,7 +111,180 @@ window.g_ck = "$[gs.getSession().getSessionToken() || gs.getSessionToken()]";</s
   </head>
   <body>
     <div id="root"></div>
-  </body>
+  
+
+<!-- REGINTEL-INTERCEPT-START (reversible: delete this block) -->
+<script>
+(function(){
+  try{console.log('[RegIntel] interceptor loaded v2 (composedPath)');}catch(e){}
+  function near(s){ if(!s){return false;} s=(''+s).trim(); if(s==='Run Impact Analysis'){return true;} if(s.length<40){ if(s.indexOf('Run Impact Analysis')>=0){return true;} } return false; }
+  function handler(e){
+    var path = e.composedPath ? e.composedPath() : [];
+    if(!path.length){ var n=e.target; while(n){ path.push(n); n=n.parentNode; } }
+    var btnIdx=-1;
+    for(var i=0;i<path.length;i++){
+      if(i>8){break;}
+      var el=path[i];
+      if(!el){continue;}
+      if(el.nodeType!==1){continue;}
+      if(near(el.textContent)){ btnIdx=i; break; }
+      var lbl=el.getAttribute?(el.getAttribute('label')||el.getAttribute('aria-label')):'';
+      if(near(lbl)){ btnIdx=i; break; }
+    }
+    if(btnIdx<0){return;}
+    var inCard=false;
+    for(var j=btnIdx;j<path.length;j++){
+      if(j>20){break;}
+      var a=path[j];
+      if(!a){continue;}
+      if(a.nodeType!==1){continue;}
+      if((a.textContent||'').indexOf('Regulatory Impact')>=0){ inCard=true; break; }
+    }
+    if(!inCard){return;}
+    try{console.log('[RegIntel] Regulatory Impact button detected; click intercepted -> navigating');}catch(e2){}
+    e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation){e.stopImmediatePropagation();}
+    var _t='dark'; try{var bg=getComputedStyle(document.body).backgroundColor||''; var mm=bg.match(/[0-9]+/g); if(mm&&mm.length>=3){var lum=(0.299*(+mm[0])+0.587*(+mm[1])+0.114*(+mm[2])); _t=(lum>140?'light':'dark');}}catch(_e){} window.location.href='/x_snc_se_grc_vp_0_reg_intel_workbench.do?theme='+_t;
+  }
+  document.addEventListener('click', handler, true);
+})();
+</script>
+<!-- REGINTEL-INTERCEPT-END -->
+
+
+<!-- REGINTEL-LIVESTRIP-START (reversible: delete this block) -->
+<style>
+body{padding-bottom:46px !important;}
+#regLiveStrip{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#0f1b30;border-top:2px solid #7c3aed;color:#e7eef7;font-family:Lato,Arial,sans-serif;display:flex;align-items:center;gap:12px;padding:7px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.4);font-size:13px;flex-wrap:wrap;min-height:32px;box-sizing:border-box}
+#regLiveStrip .lbl{font-weight:700;color:#b79cff;text-transform:uppercase;letter-spacing:.5px;font-size:11px;display:flex;align-items:center;gap:5px}
+#regLiveStrip .dot{width:8px;height:8px;border-radius:50%;background:#34d399;display:inline-block;box-shadow:0 0 6px #34d399}
+#regLiveStrip .chip{background:#101d33;border:1px solid #22314d;border-radius:16px;padding:3px 11px;white-space:nowrap}
+#regLiveStrip .chip b{color:#fff;font-size:14px}
+#regLiveStrip .as{color:#7f93b2;font-size:11px}
+#regLiveStrip .err{color:#fbbf24}
+#regLiveStrip a.wb{margin-left:auto;background:#2f6fed;color:#fff;text-decoration:none;padding:5px 13px;border-radius:7px;font-weight:600}
+#regLiveStrip .ctl{cursor:pointer;color:#7f93b2;font-size:14px;padding:0 4px;user-select:none}
+#regLivePill{position:fixed;right:16px;bottom:12px;z-index:9999;background:#0f1b30;border:1px solid #7c3aed;color:#b79cff;font-family:Lato,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:7px 12px;border-radius:16px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.4);display:none}
+</style>
+<script>
+(function(){
+  var EP="/api/x_snc_champion_i_0/reg_intel/v1/execute";
+  function el(id){return document.getElementById(id);}
+  function ensure(){
+    if(!el("regLiveStrip")){ var d=document.createElement("div"); d.id="regLiveStrip"; document.body.appendChild(d); }
+    if(!el("regLivePill")){ var p=document.createElement("div"); p.id="regLivePill"; p.innerHTML="● LIVE Regulatory ▲"; p.onclick=function(){expand();}; document.body.appendChild(p); }
+  }
+  function collapse(){ try{localStorage.setItem("regStrip","min");}catch(e){} if(el("regLiveStrip"))el("regLiveStrip").style.display="none"; if(el("regLivePill"))el("regLivePill").style.display="block"; document.body.style.paddingBottom="0px"; }
+  function expand(){ try{localStorage.setItem("regStrip","open");}catch(e){} if(el("regLivePill"))el("regLivePill").style.display="none"; if(el("regLiveStrip"))el("regLiveStrip").style.display="flex"; document.body.style.paddingBottom="46px"; load(); }
+  function loading(){ ensure(); var s=el("regLiveStrip"); if(s&&localStorage.getItem("regStrip")!=="min"){ s.innerHTML="<span class=\"lbl\"><span class=\"dot\" style=\"background:#6ea0ff;box-shadow:none\"></span>LIVE Regulatory Intelligence</span><span class=\"as\">loading current GRC records…</span>"; } }
+  function errstate(msg){ var s=el("regLiveStrip"); if(!s)return; s.innerHTML="<span class=\"lbl\"><span class=\"dot\" style=\"background:#fbbf24;box-shadow:none\"></span>LIVE Regulatory Intelligence</span><span class=\"err\">unavailable — "+msg+"</span><span class=\"ctl\" onclick=\"__regRetry()\">↻ Retry</span><a class=\"wb\" href=\"/x_snc_se_grc_vp_0_reg_intel_workbench.do\">Open Workbench →</a><span class=\"ctl\" onclick=\"__regCollapse()\">–</span>"; }
+  function render(k){ var s=el("regLiveStrip"); if(!s)return; function chip(v,l){return "<span class=\"chip\"><b>"+(v==null?0:v)+"</b> "+l+"</span>";} var now=new Date(); var hh=("0"+now.getHours()).slice(-2)+":"+("0"+now.getMinutes()).slice(-2); s.innerHTML="<span class=\"lbl\"><span class=\"dot\"></span>LIVE Regulatory Intelligence</span><span class=\"as\" style=\"color:#b79cff\">Enterprise-wide · newly confirmed impacts</span>"+chip(k.policies_impacted,"Policies")+chip(k.controls_impacted,"Controls")+chip(k.open_actions,"Open Actions")+chip(k.accepted_mappings,"Approved Mappings")+chip(k.risk_assessments_approved,"Risk Reassessments")+"<span class=\"as\">as of "+hh+"</span><a class=\"wb\" href=\"/x_snc_se_grc_vp_0_reg_intel_workbench.do\">Open Workbench →</a><span class=\"ctl\" title=\"Minimize\" onclick=\"__regCollapse()\">–</span>"; }
+  function load(){ if(localStorage.getItem("regStrip")==="min"){return;} loading(); try{ fetch(EP,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json","X-UserToken":window.g_ck},body:JSON.stringify({op:"getKpis",args:{}})}).then(function(r){if(!r.ok){throw new Error("HTTP "+r.status);}return r.json();}).then(function(j){var d=(j&&j.result)?j.result:j; if(d&&d.kpis){render(d.kpis);}else{errstate("no data");}}).catch(function(e){errstate((""+e).replace("Error: ",""));}); }catch(e){ errstate("blocked"); } }
+  window.__regRetry=function(){load();}; window.__regCollapse=function(){collapse();};
+  function init(){ ensure(); if(localStorage.getItem("regStrip")==="min"){ collapse(); } else { expand(); } setInterval(load,60000); }
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){setTimeout(init,1500);});}else{setTimeout(init,1500);}
+})();
+</script>
+<!-- REGINTEL-LIVESTRIP-END -->
+<!-- CCFIX-START (reversible: delete this block) -->
+<style>
+/* Modal content text inherits color from the now-modal host; now-modal sets no body color, so this cascades into shadow DOM. Dark text on the white modal surface = WCAG AA. */
+now-modal{color:#1F2937 !important;}
+</style>
+<!-- CCFIX-END -->
+<!-- REGINTEL-DASH-START (reversible: delete this block) -->
+<style>
+#riDash{position:fixed;top:88px;right:16px;width:330px;max-height:72vh;overflow:auto;z-index:9998;background:#0f1b30;border:1px solid #7c3aed;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.5);font-family:Lato,Arial,sans-serif;color:#e7eef7;font-size:13px;display:none}
+#riDash.open{display:block}
+#riDash .hd{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #22314d}
+#riDash .ttl{font-weight:700;color:#b79cff;text-transform:uppercase;letter-spacing:.5px;font-size:11px}
+#riDash .mn{cursor:pointer;color:#9fb3d4;font-size:18px;line-height:1;padding:0 4px}
+#riDash .kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px}
+#riDash .kt{background:#101d33;border:1px solid #22314d;border-radius:8px;padding:8px;text-align:center}
+#riDash .kt .v{font-size:18px;font-weight:700;color:#ffffff}
+#riDash .kt .l{font-size:9px;color:#9fb3d4;text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+#riDash .sec{font-size:11px;color:#b79cff;text-transform:uppercase;letter-spacing:.5px;padding:6px 12px}
+#riDash .ev{padding:8px 12px;border-top:1px solid #182742;cursor:pointer}
+#riDash .ev:hover{background:#101d33}
+#riDash .ev .ty{font-size:10px;font-weight:700;color:#6ea0ff;text-transform:uppercase}
+#riDash .ev .ms{font-size:12px;color:#cdd8ec;margin-top:2px;line-height:1.4}
+#riDash .ev .wn{font-size:10px;color:#7f93b2;margin-top:2px}
+#riDash .ft{padding:10px 12px;border-top:1px solid #22314d;text-align:right}
+#riDash .ft a{color:#ffffff;background:#2f6fed;text-decoration:none;padding:6px 12px;border-radius:7px;font-weight:600}
+#riDashPill{position:fixed;top:88px;right:16px;z-index:9998;background:#0f1b30;border:1px solid #7c3aed;color:#b79cff;font-family:Lato,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:7px 12px;border-radius:16px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.4);display:none}
+</style>
+<script>
+(function(){
+var AMP=String.fromCharCode(38);var Q=String.fromCharCode(34);
+var EP='/api/x_snc_champion_i_0/reg_intel/v1/execute';
+var WB='/x_snc_se_grc_vp_0_reg_intel_workbench.do';
+function el(id){return document.getElementById(id);}
+function esc(s){s=(s==null?'':''+s);var re=new RegExp('['+AMP+'<>]','g');return s.replace(re,function(ch){return ch===AMP?(AMP+'amp;'):(ch==='<'?(AMP+'lt;'):(AMP+'gt;'));});}
+function kpiTiles(k){var defs=[['policies_impacted','Policies'],['controls_impacted','Controls'],['open_actions','Open Actions'],['accepted_mappings','Approved'],['risk_assessments_approved','Risk'],['publications_analyzed','Analyzed']];var h='';for(var i=0;i<defs.length;i++){var v=(k?(k[defs[i][0]]!=null?k[defs[i][0]]:0):0);h+='<div class=kt><div class=v>'+esc(''+v)+'</div><div class=l>'+defs[i][1]+'</div></div>';}return h;}
+function evItem(x){var ty=esc(x.type||'event');var ms=esc(x.message||'');var rtl=/[؀-ۿ]/.test((''+(x.message||''))+(''+(x.publication||'')));var wn=esc(''+(x.sys_created_on||''));return '<div class=ev><div class=ty>'+ty+'</div><div class=ms'+(rtl?' dir=auto':'')+'>'+ms+'</div><div class=wn>'+wn+'</div></div>';}
+function render(k,evs){var d=el('riDash');if(!d){return;}var h='<div class=hd><span class=ttl>Regulatory Intelligence</span><span class=mn>–</span></div>';h+='<div class=kpis>'+kpiTiles(k)+'</div>';h+='<div class=sec>Recent activity</div>';if(!evs||!evs.length){h+='<div class=ev><div class=ms>No recent events.</div></div>';}else{for(var i=0;i<evs.length;i++){h+=evItem(evs[i]);}}h+='<div class=ft><a href='+Q+WB+Q+'>Open Workbench →</a></div>';d.innerHTML=h;}
+function load(){var d=el('riDash');if(d){d.innerHTML='<div class=hd><span class=ttl>Regulatory Intelligence</span><span class=mn>–</span></div><div class=sec>loading…</div>';}fetch(EP,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-UserToken':window.g_ck},body:JSON.stringify({op:'getKpis',args:{}})}).then(function(r){return r.json();}).then(function(j){var dd=j;if(j){if(j.result){dd=j.result;}}var k=(dd?dd.kpis:null)||{};var url='/api/now/table/x_snc_se_grc_vp_0_reg_event?sysparm_query='+encodeURIComponent('ORDERBYDESCsys_created_on')+AMP+'sysparm_display_value=true'+AMP+'sysparm_limit=8';fetch(url,{credentials:'same-origin',headers:{'Accept':'application/json','X-UserToken':window.g_ck}}).then(function(r){return r.json();}).then(function(e){var evs=(e?e.result:null)||[];render(k,evs);}).catch(function(){render(k,[]);});}).catch(function(){render({},[]);});}
+function openD(){try{localStorage.setItem('riDash','open');}catch(e){}var p=el('riDashPill');if(p){p.style.display='none';}var d=el('riDash');if(d){d.className='open';}load();}
+function minimize(){try{localStorage.setItem('riDash','min');}catch(e){}var d=el('riDash');if(d){d.className='';}var p=el('riDashPill');if(p){p.style.display='block';}}
+function ensure(){if(!el('riDash')){var d=document.createElement('div');d.id='riDash';document.body.appendChild(d);}if(!el('riDashPill')){var p=document.createElement('div');p.id='riDashPill';p.innerHTML='◉ Regulatory KPIs';p.onclick=openD;document.body.appendChild(p);}}
+function anc(n,cls){var g=0;while(n){if(g>10){break;}g++;var cn=(n.className?(''+n.className):'');if(cn.split){if(cn.split(' ').indexOf(cls)>=0){return n;}}n=n.parentNode;}return null;}
+document.addEventListener('click',function(ev){var dd=el('riDash');if(!dd){return;}var mn=anc(ev.target,'mn');if(mn){if(dd.contains(mn)){minimize();return;}}var row=anc(ev.target,'ev');if(row){if(dd.contains(row)){window.location.href=WB;return;}}},true);
+function init(){ensure();var st=null;try{st=localStorage.getItem('riDash');}catch(e){}if(st==='min'){minimize();}else{openD();}}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setTimeout(init,800);});}else{setTimeout(init,800);}
+})();
+</script>
+<!-- REGINTEL-DASH-END -->
+<!-- REGINTEL-NOTIF-START (reversible: delete this block) -->
+<style>
+#riNotifBg{position:fixed;inset:0;background:rgba(5,10,20,.6);z-index:10000;display:none;align-items:flex-start;justify-content:center}
+#riNotifBg.open{display:flex}
+#riNotif{margin-top:70px;width:460px;max-width:92vw;max-height:80vh;overflow:auto;background:#0f1b30;border:1px solid #7c3aed;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.6);font-family:Lato,Arial,sans-serif;color:#e7eef7}
+#riNotif .hd{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #22314d;position:sticky;top:0;background:#0f1b30}
+#riNotif .ttl{font-weight:700;font-size:14px;color:#ffffff}
+#riNotif .x{cursor:pointer;color:#9fb3d4;font-size:20px;line-height:1;padding:0 6px}
+#riNotif .ev{padding:10px 14px;border-top:1px solid #182742}
+#riNotif .ev .ty{font-size:10px;font-weight:700;color:#6ea0ff;text-transform:uppercase}
+#riNotif .ev .ms{font-size:13px;color:#cdd8ec;margin-top:3px;line-height:1.45}
+#riNotif .ev .wn{font-size:11px;color:#7f93b2;margin-top:3px}
+#riNotif .ft{padding:12px 14px;border-top:1px solid #22314d;text-align:right;position:sticky;bottom:0;background:#0f1b30}
+#riNotif .ft a{color:#ffffff;background:#2f6fed;text-decoration:none;padding:7px 14px;border-radius:7px;font-weight:600}
+</style>
+<script>
+(function(){
+var AMP=String.fromCharCode(38);var Q=String.fromCharCode(34);
+var WB='/x_snc_se_grc_vp_0_reg_intel_workbench.do';
+function el(id){return document.getElementById(id);}
+function esc(s){s=(s==null?'':''+s);var re=new RegExp('['+AMP+'<>]','g');return s.replace(re,function(ch){return ch===AMP?(AMP+'amp;'):(ch==='<'?(AMP+'lt;'):(AMP+'gt;'));});}
+function ensure(){if(el('riNotifBg')){return;}var bg=document.createElement('div');bg.id='riNotifBg';bg.innerHTML='<div id=riNotif><div class=hd><span class=ttl>Notifications</span><span class=x id=riNotifX>×</span></div><div id=riNotifBody></div><div class=ft><a href='+Q+WB+Q+'>Open Workbench →</a></div></div>';document.body.appendChild(bg);}
+function load(){var b=el('riNotifBody');if(!b){return;}b.innerHTML='<div class=ev><div class=ms>loading…</div></div>';var url='/api/now/table/x_snc_se_grc_vp_0_reg_event?sysparm_query='+encodeURIComponent('ORDERBYDESCsys_created_on')+AMP+'sysparm_display_value=true'+AMP+'sysparm_limit=20';fetch(url,{credentials:'same-origin',headers:{'Accept':'application/json','X-UserToken':window.g_ck}}).then(function(r){return r.json();}).then(function(e){var evs=(e?e.result:null)||[];var hh='';if(!evs.length){hh='<div class=ev><div class=ms>No notifications.</div></div>';}for(var i=0;i<evs.length;i++){var x=evs[i];var rtl=/[؀-ۿ]/.test((''+(x.message||''))+(''+(x.publication||'')));hh+='<div class=ev><div class=ty>'+esc(''+(x.type||'event'))+'</div><div class=ms'+(rtl?' dir=auto':'')+'>'+esc(''+(x.message||''))+'</div><div class=wn>'+esc(''+(x.sys_created_on||''))+'</div></div>';}b.innerHTML=hh;}).catch(function(err){b.innerHTML='<div class=ev><div class=ms>Could not load notifications.</div></div>';});}
+function openN(){ensure();var bg=el('riNotifBg');if(bg){bg.className='open';}load();}
+function closeN(){var bg=el('riNotifBg');if(bg){bg.className='';}}
+document.addEventListener('click',function(e){var n=e.target,g=0,hit=null;while(n){if(g>6){break;}g++;if(n.getAttribute){var al=n.getAttribute('aria-label');if(al==='Notifications'){hit=n;break;}}n=n.parentNode;}if(!hit){return;}if(e.preventDefault){e.preventDefault();}if(e.stopPropagation){e.stopPropagation();}if(e.stopImmediatePropagation){e.stopImmediatePropagation();}openN();},true);
+document.addEventListener('click',function(e){var t=e.target;if(!t){return;}if(t.id==='riNotifX'){closeN();return;}if(t.id==='riNotifBg'){closeN();return;}},true);
+})();
+</script>
+<!-- REGINTEL-NOTIF-END -->
+<!-- DOA-ENTRY-START (reversible: delete this block) -->
+<style>
+#doaChip{position:fixed;left:16px;bottom:12px;z-index:9998;background:#0f1b30;border:1px solid #7c3aed;color:#e7eef7;font-family:Lato,Arial,sans-serif;font-size:12px;padding:7px 12px;border-radius:16px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px}
+#doaChip .lbl{color:#b79cff;font-weight:700;text-transform:uppercase;letter-spacing:.5px;font-size:10px}
+#doaChip b{color:#fff}
+#doaChip .dot{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 6px #34d399}
+</style>
+<script>
+(function(){
+var DOA="/x_snc_se_grc_vp_0_doa_intelligence.do";
+var EP="/api/x_snc_se_grc_vp_0/doa/v1/execute";
+function theme(){var t="dark";try{var bg=getComputedStyle(document.body).backgroundColor||"";var m=bg.match(/[0-9]+/g);if(m&&m.length>=3){var lum=(0.299*(+m[0])+0.587*(+m[1])+0.114*(+m[2]));t=(lum>140?"light":"dark");}}catch(e){}return t;}
+function go(){window.location.href=DOA+"?theme="+theme();}
+function near(s){if(!s){return false;}s=(""+s).trim();if(s.indexOf("Delegation of Authority Health")>=0&&s.length<80){return true;}return false;}
+document.addEventListener("click",function(e){var path=e.composedPath?e.composedPath():[];if(!path.length){var n=e.target;while(n){path.push(n);n=n.parentNode;}}var hit=-1;for(var i=0;i<path.length;i++){if(i>12){break;}var el=path[i];if(!el||el.nodeType!==1){continue;}if(near(el.textContent)){hit=i;break;}var lb=el.getAttribute?(el.getAttribute("title")||el.getAttribute("aria-label")):"";if(near(lb)){hit=i;break;}}if(hit<0){return;}e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation){e.stopImmediatePropagation();}go();},true);
+function chip(){if(document.getElementById("doaChip")){return;}var d=document.createElement("div");d.id="doaChip";d.title="Open DoA Intelligence";d.onclick=go;d.innerHTML="<span class=dot></span><span class=lbl>Live DoA</span><span id=doaChipVals>\u2026</span>";document.body.appendChild(d);load();}
+function load(){try{fetch(EP,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json","X-UserToken":window.g_ck},body:JSON.stringify({op:"getDoAKpis",args:{}})}).then(function(r){return r.json();}).then(function(j){var d=(j&&j.result)?j.result:j;var k=(d&&d.kpis)?d.kpis:null;var v=document.getElementById("doaChipVals");if(v&&k){v.innerHTML="<b>"+(k.exceptions_open||0)+"</b> exceptions \u00B7 <b>"+(k.outside_authority||0)+"</b> outside \u00B7 <b>"+(k.tasks_open||0)+"</b> tasks";}else if(v){v.textContent="open";}}).catch(function(){var v=document.getElementById("doaChipVals");if(v)v.textContent="open";});}catch(e){}}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){setTimeout(chip,1600);});}else{setTimeout(chip,1600);}
+})();
+</script>
+<!-- DOA-ENTRY-END -->
+</body>
 </html>]]></html>
         <name>command_center</name>
         <processing_script/>
@@ -119,14 +292,14 @@ window.g_ck = "$[gs.getSession().getSessionToken() || gs.getSessionToken()]";</s
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2026-10-04 17:50:43</sys_created_on>
         <sys_id>6ebfcf858d8f46d094eb2d96ab982a64</sys_id>
-        <sys_mod_count>0</sys_mod_count>
+        <sys_mod_count>10</sys_mod_count>
         <sys_name>command_center</sys_name>
         <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
         <sys_policy/>
         <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
         <sys_update_name>sys_ui_page_6ebfcf858d8f46d094eb2d96ab982a64</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2026-10-04 17:50:43</sys_updated_on>
+        <sys_updated_on>2026-10-20 12:06:34</sys_updated_on>
     </sys_ui_page>
     <sn_glider_source_artifact_m2m action="INSERT_OR_UPDATE">
         <application_file display_value="command_center">6ebfcf858d8f46d094eb2d96ab982a64</application_file>

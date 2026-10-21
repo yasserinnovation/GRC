@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sysauto_script">
+    <sysauto_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <advanced>false</advanced>
+        <business_calendar/>
+        <condition/>
+        <conditional>false</conditional>
+        <entered_run_end/>
+        <entered_run_start/>
+        <entered_time/>
+        <max_drift/>
+        <name>Regulatory Intelligence - Daily RSS Check</name>
+        <offset/>
+        <offset_type>0</offset_type>
+        <repeat_every/>
+        <run_as display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</run_as>
+        <run_as_tz/>
+        <run_dayofmonth>1</run_dayofmonth>
+        <run_dayofweek/>
+        <run_daysofweek/>
+        <run_end/>
+        <run_month/>
+        <run_period/>
+        <run_start>2026-10-13 12:00:37</run_start>
+        <run_time>1970-01-01 03:00:00</run_time>
+        <run_type>daily</run_type>
+        <run_weekinmonth/>
+        <script><![CDATA[// Daily Umm Al-Qura RSS ingestion (Path A). Live only; no demo substitution.
+try {
+  var api = new x_snc_se_grc_vp_0.RegulatoryIntelligence();
+  var d = api.checkRSS({ feed:'decisions', max:10 });
+  var z = api.checkRSS({ feed:'gazette', max:5 });
+  gs.info('[RegIntel Daily RSS] decisions: '+JSON.stringify(d.ok?{mode:d.mode,created:d.created_count,dups:d.duplicates}:d)+' | gazette: '+JSON.stringify(z.ok?{mode:z.mode,created:z.created_count,dups:z.duplicates}:z));
+} catch(e){ gs.error('[RegIntel Daily RSS] failed: '+e); }]]></script>
+        <sys_class_name>sysauto_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 12:00:37</sys_created_on>
+        <sys_id>bec09e13c3f34b10f68a54bf050131c5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Regulatory Intelligence - Daily RSS Check</sys_name>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sysauto_script_bec09e13c3f34b10f68a54bf050131c5</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-13 12:00:37</sys_updated_on>
+        <time_zone/>
+        <upgrade_safe>false</upgrade_safe>
+    </sysauto_script>
+</record_update>

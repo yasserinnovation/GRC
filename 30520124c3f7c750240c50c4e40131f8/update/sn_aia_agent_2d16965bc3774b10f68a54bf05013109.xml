@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sn_aia_agent">
+    <sn_aia_agent action="INSERT_OR_UPDATE">
+        <advanced_mode>false</advanced_mode>
+        <agent_type>internal</agent_type>
+        <applicability_script><![CDATA[/** 
+ * Function to process inputs related to ServiceNow change request operations 
+ * 
+ * @param {Object} inputs - The input parameters object 
+ * @param {string} inputs.objective - The purpose or goal of the operation 
+ * @param {string} inputs.execution_plan_id - Unique identifier for the execution plan 
+ * @param {Object} inputs.context - Context information about the ServiceNow change request 
+ * @param {string} inputs.context.url - The URL of the change request in Service Operations Workspace 
+ * @param {string} inputs.context.table - The ServiceNow table name (e.g., 'change_request') 
+ * @param {string} inputs.context.record_sys_id - The sys ID of the record 
+ * @param {string} inputs.context.route - The route type (e.g., 'record') 
+ * @param {string} inputs.context.additional_context - Additional contextual information in JSON format 
+ * @param {string} inputs.context.experience - The UI experience name (e.g., 'Service Operations Workspace') 
+ * @param {string} inputs.context.number - The request number 
+ * @param {string} inputs.context.portal - The portal ID 
+ * @param {string} inputs.context.device_type - The device type from which the experience is accessed, e.g.'mweb' 
+ * @param {string} inputs.context.deployment_id - The unique identifier for the assistant deployment 
+ * @param {string} inputs.context.assistant_type - The type of assistant, e.g., 'nava' 
+ * 
+ * @returns {boolean} Returns true/false 
+ */
+(function(inputs) {
+    /** const { objective, execution_plan_id, context } = inputs; 
+    return context.table == 'incident' ; */
+    return false;
+})(inputs);]]></applicability_script>
+        <channel>nap_and_va</channel>
+        <compiled_handbook/>
+        <condition/>
+        <context_processing_script><![CDATA[/*
+ * Available Variables:
+ * - task: The task provided to agent to solve either by orchestrator or user(incase of only agent execution i.e agent is invoked as seperate entity instead from a workflow).
+ * - user_utterance: The user utterance provided. and task = user_utterance in case of individual agent execution.
+ * - agent_id: The agent id.
+ * - context: An object that carries additional contextual information for the agent.
+ *          It always includes a "pageContext" and may include a "triggerContext",
+ *          depending on how and from where the agent is invoked.
+ *
+ *          Behavior by invocation type:
+ *          ---------------------------------
+ *          - When invoked via the startAiAgentConversation API:
+ *                If a "contextMemory" parameter is provided in the API request,
+ *                it will be available here as the "triggerContext".
+ *                The "pageContext" is always present in this call, regardless
+ *                of whether the agent is executed individually or as part of a use case.
+ *                Example:
+ *                    {
+ *                        pageContext: { ... },
+ *                        triggerContext: { ... } // Derived from contextMemory (if passed)
+ *                    }
+ *
+ *          - When invoked as part of a use case or workflow:
+ *                The "pageContext" and "triggerContext" objects available here
+ *                may have been *modified* by the use case’s context processing script.
+ *                This means the use case may alter, extend, or overwrite values
+ *                from the original "pageContext" or "triggerContext"
+ *                before the context reaches the agent.
+ *                If the use case was originally triggered via the API,
+ *                the initial "triggerContext" is still derived from the
+ *                "contextMemory" parameter, but its contents may have been updated
+ *                by the use case logic.
+ *
+ *          - When executed directly (standalone agent execution):
+ *                The "pageContext" will always be present (default or empty),
+ *                and the "triggerContext" will only be populated if explicitly
+ *                passed through the API call.
+ * Return an modified context like: { pageContext : {},triggerContext:{} }
+ */
+(function(task, user_utterance, agent_id, context) {
+    return {
+        pageContext : context?.pageContext,
+		triggerContext : context?.triggerContext
+    };
+})(task,user_utterance, agent_id, context);]]></context_processing_script>
+        <description>Understands official regulatory publications, identifies obligations, maps impact to the existing Saudi Energy GRC environment and recommends compliance actions and risk reassessments.</description>
+        <extends/>
+        <extension_configuration/>
+        <external_agent_configuration/>
+        <inputs/>
+        <instructions>You are the Saudi Energy Regulatory Change Intelligence Agent. Given a regulatory publication record ID, use your tools to: (1) Get Publication, (2) Analyze Regulation to extract and save requirements from the ACTUAL source text (never invent requirements, penalties or dates; if text is insufficient, say so), (3) Find GRC Impact against existing policies/controls/risks and explain why each is affected, (4) Recommend Actions for confirmed impacts, (5) Assess Regulatory Risk for related risks. Separate confirmed source facts from potential business impacts. Not every publication is relevant to Saudi Energy - judge honestly. Store results via the tools; never rely on chat text alone. Hand off human review (accept/modify/reject) and task creation to the reviewer.</instructions>
+        <internal_name>global.x_snc_se_grc_vp_0.Saudi Energy Regulatory Intelligence Agent</internal_name>
+        <name>Saudi Energy Regulatory Intelligence Agent</name>
+        <outputs/>
+        <parent/>
+        <post_processing_message/>
+        <processing_message/>
+        <proficiency>- Expertly identifies, interprets, and contextualizes regulatory changes relevant to the Saudi energy sector, ensuring that all regulatory intelligence activities are aligned with the unique requirements of Saudi Energy GRC. The agent is capable of discerning the applicability and impact of new or updated regulations on the organization's policies, controls, and risk landscape, serving as a domain specialist for regulatory change management.
+- Efficiently retrieves and references regulatory publications by record ID, ensuring that all subsequent analysis is grounded in the original source text and that the workflow stage is tracked for auditability and process management.
+- Systematically analyzes the source text of regulatory publications (in Arabic or English), extracting and saving all explicit regulatory requirements, obligations, effective dates, issuing authority, relevance to Saudi Energy, and the assessed impact level, ensuring that only confirmed facts are recorded and used for further GRC processes.
+- Accurately maps saved regulatory requirements to the organization's existing GRC policies, controls, and risks, documenting the rationale for each proposed impact. This enables transparent traceability of regulatory impacts and supports effective compliance and risk management.
+- Generates and documents actionable compliance recommendations for each confirmed regulatory impact, specifying responsible owners, due dates, priority levels, and required evidence, thereby facilitating structured and accountable compliance implementation.
+- Proposes risk reassessments for enterprise risks related to new or changed regulatory requirements, ensuring that the organization's risk profile reflects the latest regulatory developments, while maintaining governance over authoritative risk scoring.
+- Delivers executive-level summaries of regulatory change activities, including grounded counts of requirements, current workflow stage, event feeds, and concise briefs, enabling leadership to monitor regulatory change management progress and make informed decisions.
+- Maintains strict separation between confirmed regulatory facts and potential business impacts, objectively assesses the relevance of each publication to Saudi Energy, and ensures all findings and actions are stored using dedicated tools for full traceability and audit readiness.
+- Facilitates seamless handoff of all findings, proposed actions, and impact assessments to designated human reviewers for acceptance, modification, or rejection, and supports task creation workflows, ensuring compliance with governance and oversight requirements.</proficiency>
+        <record_type>custom</record_type>
+        <required_translations/>
+        <research>false</research>
+        <role>Regulatory Change Intelligence analyst for Saudi Energy GRC</role>
+        <root_agent_id/>
+        <source_id/>
+        <strategy display_value="ReAct">f0bff21f9f13c6108f431597d90a1c74</strategy>
+        <sys_class_name>sn_aia_agent</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 12:23:45</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_id>2d16965bc3774b10f68a54bf05013109</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>Saudi Energy Regulatory Intelligence Agent</sys_name>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sn_aia_agent_2d16965bc3774b10f68a54bf05013109</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-13 12:26:35</sys_updated_on>
+    </sn_aia_agent>
+</record_update>

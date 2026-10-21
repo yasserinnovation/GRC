@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" audit="true" db_object_id="30d82fa6255642aea8930b3e5005cc37" label="Regulatory Requirement" name="x_snc_se_grc_vp_0_reg_requirement" type="collection">
+        <element default="new" label="Type" name="type" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Key date" sequence="4" value="date"/>
+                <element inactive_on_update="false" label="New requirement" sequence="1" value="new"/>
+                <element inactive_on_update="false" label="Important clause" sequence="3" value="clause"/>
+                <element inactive_on_update="false" label="Amended requirement" sequence="2" value="amended"/>
+            </choice>
+        </element>
+        <element label="Is Obligation" name="is_obligation" type="boolean"/>
+        <element label="Evidence Reference" max_length="255" name="evidence_ref" type="string"/>
+        <element label="Publication" name="publication" reference="x_snc_se_grc_vp_0_reg_publication" reference_cascade_rule="cascade" type="reference"/>
+        <element label="Sequence" name="sequence" type="integer"/>
+        <element label="Effective Date" name="effective_date" type="glide_date"/>
+        <element display="true" label="Short Description" max_length="255" name="short_description" type="string"/>
+        <element label="Text" max_length="4000" name="text" type="string"/>
+        <index name="index">
+            <element name="publication"/>
+        </index>
+    </element>
+</database>

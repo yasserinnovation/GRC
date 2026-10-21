@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sn_aia_tool">
+    <sn_aia_tool action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description>Map saved requirements to existing GRC policies, controls and risks and SAVE proposed impact mappings with reasons.</description>
+        <input_schema>[{"name":"pubId","description":"sys_id of the regulatory publication record","mandatory":true}]</input_schema>
+        <name>Find GRC Impact</name>
+        <record_type>custom</record_type>
+        <script><![CDATA[(function(inputs){ return new x_snc_se_grc_vp_0.RegulatoryIntelligence().runImpactAnalysis(inputs); })(inputs);]]></script>
+        <sys_class_name>sn_aia_tool</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 12:23:45</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_id>2d16565bc3774b10f68a54bf050131d9</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Find GRC Impact</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sn_aia_tool_2d16565bc3774b10f68a54bf050131d9</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-13 12:23:45</sys_updated_on>
+        <target_document/>
+        <target_document_table/>
+        <type>script</type>
+    </sn_aia_tool>
+</record_update>

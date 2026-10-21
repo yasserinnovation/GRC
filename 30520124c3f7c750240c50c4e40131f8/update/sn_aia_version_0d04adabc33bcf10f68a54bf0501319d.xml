@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sn_aia_version">
+    <sn_aia_version action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <applicability_script><![CDATA[/** 
+ * Function to determine applicability of this version based on runtime inputs 
+ * 
+ * @param {Object} inputs - The input parameters object 
+ * @param {string} inputs.channel - The channel the request originated from (e.g., 'voice', 'chat') 
+ * 
+ * @returns {boolean} Returns true/false 
+(function(inputs) {
+    return inputs.channel == 'voice' ; 
+})(inputs);*/
+(function(inputs) {
+    return inputs.channel == 'ALL';
+})(inputs);]]></applicability_script>
+        <base_version/>
+        <change_description/>
+        <condition/>
+        <eval_score/>
+        <instructions>- Upon trigger, run the Saudi Energy Regulatory Intelligence Agent.
+- Call Get Publication for the provided publication record.
+- Call Analyze Regulation to extract and save requirements.
+- Call Find GRC Impact to map policies, controls and risks.
+- Call Recommend Actions for confirmed impacts.
+- Call Assess Regulatory Risk for related risks.
+- Return the Regulatory Executive Summary.</instructions>
+        <label/>
+        <layer>overlay</layer>
+        <order/>
+        <short_description/>
+        <snapshot/>
+        <state>published</state>
+        <sys_class_name>sn_aia_version</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-14 03:23:28</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_id>0d04adabc33bcf10f68a54bf0501319d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>V1</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sn_aia_version_0d04adabc33bcf10f68a54bf0501319d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-14 03:23:28</sys_updated_on>
+        <tags/>
+        <target_id>8504adabc33bcf10f68a54bf05013189</target_id>
+        <target_table>sn_aia_usecase</target_table>
+        <version_name>V1</version_name>
+        <version_number>1</version_number>
+    </sn_aia_version>
+</record_update>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" audit="true" db_object_id="fc6c58c8c5294592b37ad69ed30a12a9" label="Regulatory Change Event" name="x_snc_se_grc_vp_0_reg_event" type="collection">
+        <element label="Publication" name="publication" reference="x_snc_se_grc_vp_0_reg_publication" reference_cascade_rule="cascade" type="reference"/>
+        <element label="Type" name="type" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Risk Assessed" sequence="5" value="risk_assessed"/>
+                <element inactive_on_update="false" label="Impact Confirmed" sequence="6" value="impact_confirmed"/>
+                <element inactive_on_update="false" label="Analyzed" sequence="2" value="analyzed"/>
+                <element inactive_on_update="false" label="Detected" sequence="1" value="detected"/>
+                <element inactive_on_update="false" label="Actions Created" sequence="4" value="actions_created"/>
+                <element inactive_on_update="false" label="Mapped" sequence="3" value="mapped"/>
+            </choice>
+        </element>
+        <element display="true" label="Message" max_length="500" name="message" type="string"/>
+        <index name="index">
+            <element name="publication"/>
+        </index>
+    </element>
+</database>

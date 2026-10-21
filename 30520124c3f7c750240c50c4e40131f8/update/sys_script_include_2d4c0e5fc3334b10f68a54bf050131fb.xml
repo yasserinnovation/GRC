@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_snc_se_grc_vp_0.RegulatoryIntelligence</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Regulatory Change Intelligence backend (RSS ingest, AI analysis, GRC impact mapping, actions/tasks, risk reassessment, executive summary). Created via scripted additive change (Path A).</description>
+        <mobile_callable>false</mobile_callable>
+        <name>RegulatoryIntelligence</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var RegulatoryIntelligence = Class.create();
+RegulatoryIntelligence.prototype = {
+  CAP: '0c90ca79533121106b38ddeeff7b12d7',
+  FEEDS: { decisions:'https://www.uqn.gov.sa/rssFeed/20', gazette:'https://www.uqn.gov.sa/rssFeed/pdf', news:'https://www.uqn.gov.sa/rssFeed/19' },
+  T: {
+    pub:'x_snc_se_grc_vp_0_reg_publication', req:'x_snc_se_grc_vp_0_reg_requirement',
+    imp:'x_snc_se_grc_vp_0_reg_impact', act:'x_snc_se_grc_vp_0_reg_action',
+    ra:'x_snc_se_grc_vp_0_reg_risk_assessment', ev:'x_snc_se_grc_vp_0_reg_event',
+    pol:'x_snc_se_grc_vp_0_grc_policy', ctl:'x_snc_se_grc_vp_0_grc_control', rsk:'x_snc_se_grc_vp_0_grc_risk'
+  },
+  initialize: function(){},
+
+  llm: function(prompt){
+    try {
+      var req = { executionRequests:[ { payload:{ prompt: prompt }, capabilityId: this.CAP } ] };
+      var res = sn_one_extend.OneExtendUtil.execute(req);
+      var p = JSON.parse(JSON.stringify(res));
+      var txt = '';
+      if (p && p.capabilities && p.capabilities[this.CAP]) txt = p.capabilities[this.CAP].response || '';
+      return { ok: (''+txt).length>0, text: ''+txt, status: p ? p.status : 'none', model: (p&&p.capabilities&&p.capabilities[this.CAP]&&p.capabilities[this.CAP].model)||'' };
+    } catch(e){ return { ok:false, text:'', error:''+e }; }
+  },
+  llmJSON: function(prompt){
+    var r = this.llm(prompt + '\n\nRESPOND WITH ONLY valid, COMPLETE, minified JSON that is properly closed (no trailing text, no markdown, no code fences). Be concise: keep every string value under 180 characters and limit any array to at most 7 items.');
+    if (!r.ok) return { _error: r.error || 'LLM returned empty', _status: r.status };
+    var t = (''+r.text).replace(/```json/gi,'').replace(/```/g,'').trim();
+    var s = t.indexOf('{'); var e = t.lastIndexOf('}');
+    if (s>=0 && e>s) t = t.substring(s, e+1);
+    try { var o = JSON.parse(t); o._model = r.model; return o; }
+    catch(err){ return { _error:'JSON parse failed: '+err, _raw:(''+r.text).substring(0,400), _model:r.model }; }
+  },
+
+  _trunc: function(v,n){ v = (v==null?'':''+v); return v.length>n ? v.substring(0,n) : v; },
+  _event: function(pubId, type, msg){
+    try { var g=new GlideRecord(this.T.ev); g.initialize(); g.setValue('publication',pubId); g.setValue('type',type); g.setValue('message',this._trunc(msg,500)); g.insert(); } catch(e){}
+  },
+  _rssDate: function(s){
+    try { var ms = Date.parse(s); if (isNaN(ms)) return ''; var d=new GlideDateTime(); d.setNumericValue(ms); return d.getDate().getValue(); } catch(e){ return ''; }
+  },
+  _pub: function(id){ var g=new GlideRecord(this.T.pub); return g.get(id) ? g : null; },
+
+  checkRSS: function(a){
+    a = a||{};
+    if (a.demo === true) return this._demoRSS();
+    var url = a.url || this.FEEDS[a.feed||'decisions'] || this.FEEDS.decisions;
+    var source = (a.feed==='gazette') ? 'umm_al_qura_gazette' : 'umm_al_qura_decisions';
+    var body='', status=0, errMsg='';
+    try {
+      var rm = new sn_ws.RESTMessageV2(); rm.setHttpMethod('GET'); rm.setEndpoint(url);
+      rm.setRequestHeader('Accept','application/rss+xml, text/xml, */*'); rm.setHttpTimeout(25000);
+      var resp = rm.execute(); status = resp.getStatusCode(); body = resp.getBody()||''; errMsg = resp.getErrorMessage()||'';
+    } catch(e){ return { ok:false, mode:'live_failed', url:url, error:''+e, hint:'Call again with {demo:true} to use clearly-labeled demo data.' }; }
+    if (status!=200 || !body) return { ok:false, mode:'live_failed', url:url, status:status, error:errMsg, hint:'Call again with {demo:true} to use clearly-labeled demo data.' };
+    var items = this._parseRSS(body);
+    var max = a.max || 10; var created=[], dup=0;
+    for (var i=0;i<items.length && created.length<max;i++){
+      var it = items[i]; var ext = it.guid || it.link || it.title;
+      if (!ext) continue;
+      var ex = new GlideRecord(this.T.pub); ex.addQuery('external_id', ext); ex.query();
+      if (ex.next()){ dup++; continue; }
+      var g=new GlideRecord(this.T.pub); g.initialize();
+      g.setValue('title', this._trunc(it.title,255));
+      g.setValue('source', source);
+      g.setValue('source_url', it.link);
+      g.setValue('external_id', this._trunc(ext,255));
+      g.setValue('publication_date', this._rssDate(it.pubDate));
+      g.setValue('language','ar');
+      g.setValue('category', this._trunc(it.category||'Umm Al-Qura',100));
+      g.setValue('summary', this._trunc(it.description, 1500));
+      g.setValue('full_text', it.description||'');
+      g.setValue('status','detected');
+      g.setValue('impact_level','unknown');
+      g.setValue('is_demo', false);
+      g.setValue('active', true);
+      var id=g.insert();
+      this._event(id,'detected','Detected from live Umm Al-Qura feed: '+this._trunc(it.title,120));
+      created.push({ sys_id:id, title:it.title, external_id:ext, source_url:it.link });
+    }
+    return { ok:true, mode:'live', url:url, http_status:status, fetched:items.length, created_count:created.length, duplicates:dup, created:created };
+  },
+  _parseRSS: function(xml){
+    var items=[]; var re=/<item[\s\S]*?<\/item>/gi; var m;
+    while((m=re.exec(xml))!==null){
+      var blk=m[0];
+      items.push({
+        title: this._tag(blk,'title'), link: this._tag(blk,'link'),
+        description: this._tag(blk,'description'), pubDate: this._tag(blk,'pubDate'),
+        guid: this._tag(blk,'guid'), category: this._tag(blk,'category')
+      });
+    }
+    return items;
+  },
+  _tag: function(blk,tag){
+    var r=new RegExp('<'+tag+'[^>]*>([\\s\\S]*?)<\\/'+tag+'>','i'); var m=r.exec(blk);
+    if(!m) return '';
+    var v=m[1]; v=v.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,'$1');
+    v=v.replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
+    return v;
+  },
+  _demoRSS: function(){
+    var samples=[
+      { ext:'DEMO-GRID-REL-2026-amend', title:'Grid Reliability Reporting Amendment', cat:'Decisions & Regulations',
+        desc:'DEMONSTRATION DATA. Amendment tightens grid reliability and operational reporting obligations for licensed energy operators: shortens the reporting cadence from quarterly to monthly, lowers the unplanned-downtime disclosure threshold, mandates root-cause reporting within 72 hours, and requires an annual independent reliability audit. Effective 2027-01-01.' },
+      { ext:'DEMO-TARIFF-DISCLOSURE-2026', title:'Energy Tariff Disclosure Guideline (Demo)', cat:'Decisions & Regulations',
+        desc:'DEMONSTRATION DATA. Guideline introduces enhanced tariff transparency and customer disclosure requirements for electricity providers, with new quarterly reporting to the regulator.' }
+    ];
+    var created=[], dup=0;
+    for (var i=0;i<samples.length;i++){
+      var s=samples[i];
+      var ex=new GlideRecord(this.T.pub); ex.addQuery('external_id', s.ext); ex.query();
+      if (ex.next()){ dup++; continue; }
+      var g=new GlideRecord(this.T.pub); g.initialize();
+      g.setValue('title', s.title); g.setValue('source','demo'); g.setValue('external_id', s.ext);
+      g.setValue('category', s.cat); g.setValue('language','mixed'); g.setValue('summary', this._trunc(s.desc,1500));
+      g.setValue('full_text', s.desc); g.setValue('status','detected'); g.setValue('impact_level','unknown');
+      g.setValue('is_demo', true); g.setValue('active', true);
+      var id=g.insert(); this._event(id,'detected','Demo RSS item created (DEMONSTRATION DATA).');
+      created.push({ sys_id:id, title:s.title, external_id:s.ext });
+    }
+    return { ok:true, mode:'demo', demo_rss_mode:true, label:'Demo RSS Mode', fetched:samples.length, created_count:created.length, duplicates:dup, created:created };
+  },
+
+  analyzeRegulation: function(a){
+    a=a||{}; var pub=this._pub(a.pubId||a.publication); if(!pub) return { ok:false, error:'publication not found' };
+    var content = this._trunc((pub.getValue('title')||'')+'\n'+(pub.getValue('summary')||'')+'\n'+(pub.getValue('full_text')||''), 6000);
+    var prompt = 'You are a Regulatory Change Intelligence analyst supporting Saudi Energy (a licensed electricity/energy operator in Saudi Arabia). '+
+      'Analyze the following official regulatory source text (it may be Arabic, English or mixed). Use ONLY the actual source text. Do NOT invent legal requirements, penalties, authorities or dates. '+
+      'Not every publication is relevant to an energy operator; judge relevance honestly. If the source is only a headline/too short to extract real requirements, set needs_full_text=true and return an empty requirements array.\n\n'+
+      'SOURCE:\n'+content+'\n\n'+
+      'Return JSON with keys: summary_en (concise business English summary), authority (issuing body if stated else ""), language (ar|en|mixed), '+
+      'relevance (relevant|uncertain|not_relevant), relevance_score (0-100 integer for Saudi Energy relevance), impact_level (unknown|low|moderate|high|critical), '+
+      'needs_full_text (boolean), affected_departments (array of strings), recommended_priority (low|medium|high|critical), '+
+      'requirements (array of objects: {text, type:(new|amended|clause|date), is_obligation:boolean, effective_date:(YYYY-MM-DD or ""), evidence:(short quote/clause ref from source)}).';
+    var o = this.llmJSON(prompt);
+    if (o._error) return { ok:false, error:'AI analysis failed', detail:o._error, raw:o._raw };
+    pub.setValue('summary', this._trunc(o.summary_en||pub.getValue('summary'),1500));
+    if (o.authority && pub.getValue('is_demo')!='1') pub.setValue('authority', this._trunc(o.authority,255));
+    if (o.language) pub.setValue('language', o.language);
+    if (o.relevance_score!=null) pub.setValue('ai_relevance', parseInt(o.relevance_score,10)||0);
+    if (o.impact_level) pub.setValue('impact_level', o.impact_level);
+    pub.setValue('status','analyzed'); pub.update();
+    var del=new GlideRecord(this.T.req); del.addQuery('publication', pub.getUniqueValue()); del.query(); while(del.next()) del.deleteRecord();
+    var reqs = o.requirements||[]; var createdReq=[];
+    for (var i=0;i<reqs.length;i++){
+      var rq=reqs[i]; var g=new GlideRecord(this.T.req); g.initialize();
+      g.setValue('publication', pub.getUniqueValue()); g.setValue('sequence', i+1);
+      g.setValue('text', this._trunc(rq.text,4000)); g.setValue('short_description', this._trunc(rq.text,150));
+      g.setValue('type', (rq.type||'new')); g.setValue('is_obligation', rq.is_obligation===true);
+      if (rq.effective_date) g.setValue('effective_date', rq.effective_date);
+      g.setValue('evidence_ref', this._trunc(rq.evidence,500));
+      var rid=g.insert(); createdReq.push({ sys_id:rid, text:this._trunc(rq.text,120), type:rq.type, is_obligation:rq.is_obligation===true });
+    }
+    this._event(pub.getUniqueValue(),'analyzed','AI analysis complete: '+createdReq.length+' requirements extracted ('+(o._model||'LLM')+').');
+    return { ok:true, publication:pub.getUniqueValue(), model:o._model, summary_en:o.summary_en, authority:o.authority, language:o.language,
+      relevance:o.relevance, relevance_score:o.relevance_score, impact_level:o.impact_level, needs_full_text:o.needs_full_text===true,
+      affected_departments:o.affected_departments||[], recommended_priority:o.recommended_priority, requirements:createdReq, requirements_count:createdReq.length };
+  },
+
+  _grcCatalog: function(){
+    var cat={ list:[], map:{} }; var self=this; var n;
+    var p=new GlideRecord(this.T.pol); p.query(); n=0; while(p.next()){ n++; var ref='POL'+n; cat.map[ref]={table:self.T.pol,id:p.getUniqueValue(),type:'policy',label:p.getValue('name')}; cat.list.push(ref+' [Policy] '+p.getValue('name')+' (BU:'+(p.getValue('business_unit')||'')+')'); }
+    var c=new GlideRecord(this.T.ctl); c.query(); n=0; while(c.next()){ n++; var ref2='CTL'+n; cat.map[ref2]={table:self.T.ctl,id:c.getUniqueValue(),type:'control',label:c.getValue('name')}; cat.list.push(ref2+' [Control] '+c.getValue('name')+' ('+(c.getValue('control_id')||'')+', family:'+(c.getValue('family')||'')+', BU:'+(c.getValue('business_unit')||'')+')'); }
+    var r=new GlideRecord(this.T.rsk); r.query(); n=0; while(r.next()){ n++; var ref3='RSK'+n; cat.map[ref3]={table:self.T.rsk,id:r.getUniqueValue(),type:'risk',label:r.getValue('name')}; cat.list.push(ref3+' [Risk] '+r.getValue('name')+' (category:'+(r.getValue('category')||'')+', BU:'+(r.getValue('business_unit')||'')+', residual:'+(r.getValue('residual_score')||'')+')'); }
+    return cat;
+  },
+
+  runImpactAnalysis: function(a){
+    a=a||{}; var pub=this._pub(a.pubId||a.publication); if(!pub) return { ok:false, error:'publication not found' };
+    var reqs=[]; var rg=new GlideRecord(this.T.req); rg.addQuery('publication',pub.getUniqueValue()); rg.orderBy('sequence'); rg.query();
+    while(rg.next()) reqs.push({ idx:reqs.length+1, sys_id:rg.getUniqueValue(), text:rg.getValue('text') });
+    if(!reqs.length) return { ok:false, error:'No requirements. Run analyzeRegulation first.' };
+    var cat=this._grcCatalog();
+    var reqText=''; for (var i=0;i<reqs.length;i++) reqText += 'R'+reqs[i].idx+': '+this._trunc(reqs[i].text,300)+'\n';
+    var prompt='You are mapping regulatory requirements to an existing Saudi Energy GRC register. '+
+      'For each requirement, identify which existing GRC records (ONLY from the catalog below, by their reference code) are plausibly impacted. '+
+      'Do NOT invent records; use only the provided reference codes. Explain WHY each is impacted. If a requirement maps to nothing, omit it.\n\n'+
+      'REQUIREMENTS:\n'+reqText+'\nGRC CATALOG:\n'+cat.list.join('\n')+'\n\n'+
+      'Return JSON: {mappings:[{req:(integer requirement number), ref:(catalog code e.g. POL1/CTL2/RSK1), reason:(short why), priority:(low|medium|high|critical), department:(business unit)}]}';
+    var o=this.llmJSON(prompt);
+    if(o._error) return { ok:false, error:'AI impact mapping failed', detail:o._error, raw:o._raw };
+    var del=new GlideRecord(this.T.imp); del.addQuery('publication',pub.getUniqueValue()); del.addQuery('review_decision','pending'); del.query(); while(del.next()) del.deleteRecord();
+    var maps=o.mappings||[]; var created=[]; var seen={};
+    for (var j=0;j<maps.length;j++){
+      var mp=maps[j];
+      var __refs=(''+mp.ref).toUpperCase().split(/[^A-Z0-9]+/);
+      var reqRef = reqs[(parseInt(mp.req,10)||1)-1] || reqs[0];
+      for(var __r=0;__r<__refs.length;__r++){
+        var tgt=cat.map[__refs[__r]]; if(!tgt) continue;
+        if(seen[tgt.id]) continue; seen[tgt.id]=true;
+        var g=new GlideRecord(this.T.imp); g.initialize();
+        g.setValue('publication',pub.getUniqueValue());
+        if(reqRef) g.setValue('requirement',reqRef.sys_id);
+        g.setValue('target_table',tgt.table); g.setValue('target_id',tgt.id); g.setValue('target_label',tgt.label);
+        g.setValue('record_type',tgt.type); g.setValue('reason',this._trunc(mp.reason,1000));
+        g.setValue('priority',(mp.priority||'medium')); g.setValue('department',this._trunc(mp.department,100));
+        g.setValue('review_decision','pending');
+        var id=g.insert();
+        created.push({ sys_id:id, record_type:tgt.type, target_label:tgt.label, priority:(mp.priority||'medium'), department:mp.department, reason:this._trunc(mp.reason,160) });
+      }
+    }
+    if(pub.getValue('status')=='analyzed'||pub.getValue('status')=='detected'){ pub.setValue('status','mapped'); pub.update(); }
+    this._event(pub.getUniqueValue(),'mapped','Impact mapping complete: '+created.length+' proposed GRC impacts.');
+    return { ok:true, publication:pub.getUniqueValue(), model:o._model, mappings_count:created.length, mappings:created };
+  },
+
+  saveReviewDecision: function(a){
+    a=a||{}; if(!a.impactId) return { ok:false, error:'impactId required' };
+    var dec=(a.decision||'').toLowerCase(); if(['accepted','modified','rejected'].indexOf(dec)<0) return { ok:false, error:'decision must be accepted|modified|rejected' };
+    var g=new GlideRecord(this.T.imp); if(!g.get(a.impactId)) return { ok:false, error:'impact not found' };
+    g.setValue('review_decision',dec); g.setValue('reviewer', a.reviewer||gs.getUserName()); g.setValue('reviewed_on', new GlideDateTime().getValue());
+    if(dec=='modified'){ if(a.reason!=null) g.setValue('reason',this._trunc(a.reason,1000)); if(a.priority) g.setValue('priority',a.priority); if(a.department!=null) g.setValue('department',this._trunc(a.department,100)); }
+    g.update();
+    try{ var _tt=g.getValue('target_table'), _ti=g.getValue('target_id'); if(_tt && _ti && (_tt=='x_snc_se_grc_vp_0_grc_policy'||_tt=='x_snc_se_grc_vp_0_grc_control')){ var _flag=(dec=='accepted'||dec=='modified'); if(_flag){ var _tr=new GlideRecord(_tt); if(_tr.get(_ti)){ _tr.setValue('reg_impacted',true); _tr.update(); } } else { var _other=new GlideRecord(this.T.imp); _other.addQuery('target_id',_ti); _other.addQuery('sys_id','!=',g.getUniqueValue()); _other.addQuery('review_decisionIN accepted,modified'); _other.query(); if(!_other.hasNext()){ var _tr2=new GlideRecord(_tt); if(_tr2.get(_ti)){ _tr2.setValue('reg_impacted',false); _tr2.update(); } } } } }catch(_e){}
+    var pubId=g.getValue('publication');
+    var pend=new GlideRecord(this.T.imp); pend.addQuery('publication',pubId); pend.addQuery('review_decision','pending'); pend.query();
+    var allDone = !pend.hasNext();
+    if(allDone){ var pub=this._pub(pubId); if(pub && ['mapped','analyzed'].indexOf(pub.getValue('status'))>=0){ pub.setValue('status','reviewed'); pub.update(); this._event(pubId,'impact_confirmed','All proposed impacts reviewed.'); } }
+    return { ok:true, impactId:a.impactId, decision:dec, all_reviewed:allDone };
+  },
+
+  generateActions: function(a){
+    a=a||{}; var pub=this._pub(a.pubId||a.publication); if(!pub) return { ok:false, error:'publication not found' };
+    var imps=[]; var ig=new GlideRecord(this.T.imp); ig.addQuery('publication',pub.getUniqueValue()); ig.addQuery('review_decision','IN','accepted,modified'); ig.query();
+    while(ig.next()){
+      var ea=new GlideRecord(this.T.act); ea.addQuery('impact',ig.getUniqueValue()); ea.query(); if(ea.next()) continue;
+      var reqTxt=''; if(ig.getValue('requirement')){ var rq=new GlideRecord(this.T.req); if(rq.get(ig.getValue('requirement'))) reqTxt=rq.getValue('text'); }
+      imps.push({ sys_id:ig.getUniqueValue(), type:ig.getValue('record_type'), label:ig.getValue('target_label'), reason:ig.getValue('reason'), dept:ig.getValue('department'), reqId:ig.getValue('requirement'), related:ig.getValue('target_id'), reqTxt:reqTxt, idx:imps.length+1 });
+    }
+    if(!imps.length) return { ok:false, error:'No accepted/modified mappings (or actions already generated).' };
+    var listTxt=''; for(var i=0;i<imps.length;i++) listTxt += 'M'+imps[i].idx+': impacted '+imps[i].type+' "'+imps[i].label+'" (dept:'+(imps[i].dept||'')+'). Requirement: '+this._trunc(imps[i].reqTxt,200)+'. Reason: '+this._trunc(imps[i].reason,200)+'\n';
+    var prompt='You are proposing practical compliance actions for Saudi Energy following a regulatory change. For each mapping below propose ONE action. '+
+      'Be concrete and practical; do not invent legal penalties. \n\nMAPPINGS:\n'+listTxt+'\n'+
+      'Return JSON: {actions:[{m:(integer mapping number), short_description, description, business_unit, suggested_owner, due_in_days:(integer), priority:(low|medium|high|critical), required_evidence}]}';
+    var o=this.llmJSON(prompt);
+    if(o._error) return { ok:false, error:'AI action generation failed', detail:o._error, raw:o._raw };
+    var acts=o.actions||[]; var created=[];
+    for(var k=0;k<acts.length;k++){
+      var ac=acts[k]; var mp=imps[(parseInt(ac.m,10)||1)-1]; if(!mp) continue;
+      var g=new GlideRecord(this.T.act); g.initialize();
+      g.setValue('publication',pub.getUniqueValue()); g.setValue('impact',mp.sys_id);
+      if(mp.reqId) g.setValue('requirement',mp.reqId);
+      g.setValue('related_record',mp.related);
+      g.setValue('short_description',this._trunc(ac.short_description,150));
+      g.setValue('description',this._trunc(ac.description,4000));
+      g.setValue('business_unit',this._trunc(ac.business_unit||mp.dept,100));
+      g.setValue('assigned_to',this._trunc(ac.suggested_owner,100));
+      g.setValue('priority',(ac.priority||'medium'));
+      g.setValue('required_evidence',this._trunc(ac.required_evidence,1000));
+      var dd=new GlideDateTime(); dd.addDaysLocalTime(parseInt(ac.due_in_days,10)||30); g.setValue('due_date', dd.getDate().getValue());
+      g.setValue('status','draft');
+      var id=g.insert();
+      created.push({ sys_id:id, short_description:this._trunc(ac.short_description,120), business_unit:ac.business_unit||mp.dept, assigned_to:ac.suggested_owner, priority:(ac.priority||'medium'), due_date:dd.getDate().getValue(), status:'draft' });
+    }
+    this._event(pub.getUniqueValue(),'actions_created','Proposed '+created.length+' compliance actions (draft).');
+    return { ok:true, publication:pub.getUniqueValue(), model:o._model, actions_count:created.length, actions:created };
+  },
+  createTasks: function(a){
+    a=a||{}; var pub=this._pub(a.pubId||a.publication); if(!pub) return { ok:false, error:'publication not found' };
+    var ag=new GlideRecord(this.T.act); ag.addQuery('publication',pub.getUniqueValue()); ag.addQuery('status','draft'); ag.query();
+    var created=[];
+    while(ag.next()){
+      var num=this._nextTaskNumber();
+      ag.setValue('task_number',num); ag.setValue('status','open'); ag.update();
+      created.push({ sys_id:ag.getUniqueValue(), task_number:num, short_description:ag.getValue('short_description'), assigned_to:ag.getValue('assigned_to'), due_date:ag.getValue('due_date'), status:'open' });
+    }
+    if(created.length){ pub.setValue('status','actions_created'); pub.update(); this._event(pub.getUniqueValue(),'actions_created',created.length+' compliance tasks created and assigned.'); }
+    return { ok: created.length>0, publication:pub.getUniqueValue(), tasks_created:created.length, tasks:created, note: created.length?undefined:'No draft actions to convert. Run generateActions first.' };
+  },
+  _nextTaskNumber: function(){
+    var c=0; var g=new GlideAggregate(this.T.act); g.addQuery('task_number','!=',''); g.addAggregate('COUNT'); g.query(); if(g.next()) c=parseInt(g.getAggregate('COUNT'),10)||0;
+    var n=''+(c+1); while(n.length<4) n='0'+n; return 'REGACT'+n;
+  },
+  setActionStatus: function(a){
+    a=a||{}; if(!a.actionId) return { ok:false, error:'actionId required' };
+    var st=(a.status||'').toLowerCase(); if(['draft','open','in_progress','completed'].indexOf(st)<0) return { ok:false, error:'invalid status' };
+    var g=new GlideRecord(this.T.act); if(!g.get(a.actionId)) return { ok:false, error:'action not found' };
+    g.setValue('status',st); g.update(); return { ok:true, actionId:a.actionId, status:st };
+  },
+
+  assessRisk: function(a){
+    a=a||{}; var pub=this._pub(a.pubId||a.publication); if(!pub) return { ok:false, error:'publication not found' };
+    var riskIds={}; var ig=new GlideRecord(this.T.imp); ig.addQuery('publication',pub.getUniqueValue()); ig.addQuery('record_type','risk'); ig.addQuery('review_decision','IN','accepted,modified'); ig.query();
+    while(ig.next()) riskIds[ig.getValue('target_id')]=true;
+    if(!this._keys(riskIds).length){
+      var depts={}; var dg=new GlideRecord(this.T.imp); dg.addQuery('publication',pub.getUniqueValue()); dg.addQuery('review_decision','IN','accepted,modified'); dg.query(); while(dg.next()){ if(dg.getValue('department')) depts[dg.getValue('department')]=true; }
+      var rr=new GlideRecord(this.T.rsk); rr.query(); while(rr.next()){ if(depts[rr.getValue('business_unit')]) riskIds[rr.getUniqueValue()]=true; }
+    }
+    var ids=this._keys(riskIds); if(!ids.length) return { ok:false, error:'No related risks. Accept at least one risk mapping (or a mapping whose department matches a risk).' };
+    var pubSummary=this._trunc(pub.getValue('summary'),1500);
+    var created=[];
+    var rinfo=[]; for(var i=0;i<ids.length;i++){ var g=new GlideRecord(this.T.rsk); if(g.get(ids[i])) rinfo.push({ idx:rinfo.length+1, id:ids[i], name:g.getValue('name'), cur:parseInt(g.getValue('residual_score'),10)||0, ce:g.getValue('control_effectiveness'), app:g.getValue('appetite'), tol:g.getValue('tolerance'), cat:g.getValue('category'), bu:g.getValue('business_unit') }); }
+    var rtxt=''; for(var j=0;j<rinfo.length;j++) rtxt += 'K'+rinfo[j].idx+': "'+rinfo[j].name+'" category='+rinfo[j].cat+' BU='+rinfo[j].bu+' current_residual='+rinfo[j].cur+' control_effectiveness='+rinfo[j].ce+' appetite='+rinfo[j].app+' tolerance='+rinfo[j].tol+'\n';
+    var prompt='You are reassessing existing Saudi Energy enterprise risks after a regulatory change. Regulation summary: "'+pubSummary+'". '+
+      'For each risk below propose an updated residual risk score (0-100 integer) reflecting the regulatory change, with a brief reason, recommended mitigation, and related controls (names). '+
+      'Keep proposals reasonable relative to the current score and justified by the regulation. Do NOT invent data.\n\nRISKS:\n'+rtxt+'\n'+
+      'Return JSON: {assessments:[{k:(integer), proposed_score:(0-100 integer), reason, recommended_mitigation, related_controls}]}';
+    var o=this.llmJSON(prompt);
+    if(o._error) return { ok:false, error:'AI risk reassessment failed', detail:o._error, raw:o._raw };
+    var asm=o.assessments||[];
+    for(var m=0;m<asm.length;m++){
+      var as=asm[m]; var ri=rinfo[(parseInt(as.k,10)||1)-1]; if(!ri) continue;
+      var ex=new GlideRecord(this.T.ra); ex.addQuery('publication',pub.getUniqueValue()); ex.addQuery('risk',ri.id); ex.addQuery('review_decision','pending'); ex.query(); if(ex.next()) continue;
+      var ps=parseInt(as.proposed_score,10); if(isNaN(ps)) ps=ri.cur; if(ps<0)ps=0; if(ps>100)ps=100;
+      var g2=new GlideRecord(this.T.ra); g2.initialize();
+      g2.setValue('publication',pub.getUniqueValue()); g2.setValue('risk',ri.id);
+      g2.setValue('current_score',ri.cur); g2.setValue('proposed_score',ps); g2.setValue('delta',ps-ri.cur);
+      g2.setValue('reason',this._trunc(as.reason,1000)); g2.setValue('recommended_mitigation',this._trunc(as.recommended_mitigation,1000));
+      g2.setValue('related_controls',this._trunc(as.related_controls instanceof Array ? as.related_controls.join(', ') : as.related_controls,500));
+      g2.setValue('review_decision','pending'); g2.setValue('approved',false);
+      var id=g2.insert();
+      created.push({ sys_id:id, risk:ri.name, current_score:ri.cur, proposed_score:ps, delta:ps-ri.cur, reason:this._trunc(as.reason,160) });
+    }
+    pub.setValue('status','risk_assessed'); pub.update();
+    this._event(pub.getUniqueValue(),'risk_assessed','Proposed '+created.length+' risk reassessments (pending review).');
+    return { ok:true, publication:pub.getUniqueValue(), model:o._model, assessments_count:created.length, assessments:created, note:'Proposed only. Existing authoritative risk scores are NOT changed.' };
+  },
+  saveRiskAssessment: function(a){
+    a=a||{}; if(!a.assessmentId) return { ok:false, error:'assessmentId required' };
+    var dec=(a.decision||'').toLowerCase(); if(['accepted','modified','rejected'].indexOf(dec)<0) return { ok:false, error:'decision must be accepted|modified|rejected' };
+    var g=new GlideRecord(this.T.ra); if(!g.get(a.assessmentId)) return { ok:false, error:'assessment not found' };
+    if(dec=='modified' && a.proposed_score!=null){ var ps=parseInt(a.proposed_score,10)||0; g.setValue('proposed_score',ps); g.setValue('delta',ps-(parseInt(g.getValue('current_score'),10)||0)); }
+    if(dec=='modified' && a.reason!=null) g.setValue('reason',this._trunc(a.reason,1000));
+    g.setValue('review_decision',dec); g.setValue('approved', dec=='accepted'); g.setValue('reviewer',a.reviewer||gs.getUserName()); g.setValue('reviewed_on', new GlideDateTime().getValue());
+    g.update();
+    return { ok:true, assessmentId:a.assessmentId, decision:dec, approved:(dec=='accepted'), authoritative_risk_unchanged:true,
+      note:'Approved assessment stored as linked POC record. Existing grc_risk residual score is intentionally NOT modified (requires explicit approval to apply).' };
+  },
+
+  _keys: function(o){ var a=[]; for(var k in o){ if(o.hasOwnProperty(k)) a.push(k); } return a; },
+  _count: function(table, q){ var g=new GlideAggregate(table); if(q) g.addEncodedQuery(q); g.addAggregate('COUNT'); g.query(); return g.next()?parseInt(g.getAggregate('COUNT'),10):0; },
+  getExecutiveRegulatorySummary: function(a){
+    a=a||{}; var pubId=a.pubId||a.publication; var scopeQ = pubId ? 'publication='+pubId : '';
+    var reqQ = pubId? 'publication='+pubId : '';
+    var counts = {
+      requirements: this._count(this.T.req, reqQ),
+      obligations: this._count(this.T.req, (reqQ?reqQ+'^':'')+'is_obligation=true'),
+      impacted_policies: this._distinctTargets('policy', pubId),
+      impacted_controls: this._distinctTargets('control', pubId),
+      impacted_risks: this._distinctTargets('risk', pubId),
+      proposed_mappings: this._count(this.T.imp, scopeQ),
+      accepted_mappings: this._count(this.T.imp, (scopeQ?scopeQ+'^':'')+'review_decisionINaccepted,modified'),
+      open_actions: this._count(this.T.act, (scopeQ?scopeQ+'^':'')+'statusINopen,in_progress'),
+      total_actions: this._count(this.T.act, scopeQ),
+      risk_assessments: this._count(this.T.ra, scopeQ),
+      approved_risk_assessments: this._count(this.T.ra, (scopeQ?scopeQ+'^':'')+'approved=true')
+    };
+    var depts={}; var ig=new GlideRecord(this.T.imp); if(pubId) ig.addQuery('publication',pubId); ig.query(); while(ig.next()){ if(ig.getValue('department')) depts[ig.getValue('department')]=true; }
+    counts.impacted_departments = this._keys(depts).length;
+    var stage = pubId ? this._stage(pubId) : null;
+    var feed=[]; var eg=new GlideRecord(this.T.ev); if(pubId) eg.addQuery('publication',pubId); eg.orderByDesc('sys_created_on'); eg.setLimit(12); eg.query();
+    while(eg.next()) feed.push({ type:eg.getValue('type'), message:eg.getValue('message'), when:eg.getValue('sys_created_on') });
+    var title=''; var impact=''; if(pubId){ var pub=this._pub(pubId); if(pub){ title=pub.getValue('title'); impact=pub.getValue('impact_level'); } }
+    var brief=null;
+    if(a.brief!==false){
+      var prompt='Write a concise executive brief for a VP from these FACTS only (do not invent beyond them). '+
+        'Regulation: "'+title+'" (impact level '+impact+'). Facts: '+JSON.stringify(counts)+'. '+
+        'Return JSON: {what_happened, why_it_matters, what_is_impacted, business_exposure, actions_underway, decisions_needed}. Keep each under 240 characters.';
+      var ob=this.llmJSON(prompt); if(!ob._error) brief=ob; else brief={ _error:ob._error };
+    }
+    return { ok:true, publication:pubId||null, title:title, impact_level:impact, counts:counts, workflow:stage, events:feed, executive_brief:brief };
+  },
+  _distinctTargets: function(type, pubId){ var m={}; var g=new GlideRecord(this.T.imp); g.addQuery('record_type',type); if(pubId) g.addQuery('publication',pubId); g.query(); while(g.next()) m[g.getValue('target_id')]=true; return this._keys(m).length; },
+  _stage: function(pubId){
+    var pub=this._pub(pubId); var st=pub?pub.getValue('status'):'detected';
+    var order=['detected','analyzed','mapped','reviewed','actions_created','risk_assessed'];
+    var idx=order.indexOf(st); var steps=[];
+    for(var i=0;i<order.length;i++) steps.push({ step:order[i], done: i<=idx });
+    return { current:st, steps:steps };
+  },
+
+  getPublication: function(a){
+    a=a||{}; var pub=this._pub(a.pubId||a.publication); if(!pub) return { ok:false, error:'not found' };
+    return { ok:true, publication:this._pubObj(pub), workflow:this._stage(pub.getUniqueValue()) };
+  },
+  listPublications: function(a){
+    a=a||{}; var arr=[]; var g=new GlideRecord(this.T.pub);
+    if(a.live_only) g.addQuery('is_demo',false);
+    g.orderByDesc('sys_created_on'); g.setLimit(a.limit||50); g.query();
+    while(g.next()) arr.push(this._pubObj(g));
+    return { ok:true, count:arr.length, publications:arr };
+  },
+  _pubObj: function(g){
+    return { sys_id:g.getUniqueValue(), title:g.getValue('title'), source:g.getValue('source'), source_label:g.getDisplayValue('source'),
+      source_url:g.getValue('source_url'), authority:g.getValue('authority'), category:g.getValue('category'), language:g.getValue('language'),
+      publication_date:g.getValue('publication_date'), status:g.getValue('status'), impact_level:g.getValue('impact_level'),
+      ai_relevance:g.getValue('ai_relevance'), is_demo:g.getValue('is_demo')=='1', summary:g.getValue('summary') };
+  },
+
+  selfTest: function(a){ var g=new GlideRecord(this.T.ev); g.initialize(); g.setValue('publication','c105dcee984d484da379973d06b7445f'); g.setValue('type','detected'); g.setValue('message','SELFTEST '+((a&&a.nonce)||'')); var id=g.insert(); return {ok:true, logged:id, nonce:(a&&a.nonce)||''}; },
+  importText: function(a){
+    a=a||{}; if(!a.text) return {ok:false,error:'text required'};
+    var g=new GlideRecord(this.T.pub); g.initialize();
+    g.setValue('title', this._trunc(a.title||'Imported regulatory text',255));
+    g.setValue('source','pdf_upload'); g.setValue('language', a.language||'mixed');
+    g.setValue('external_id','UPLOAD-'+new GlideDateTime().getNumericValue());
+    g.setValue('category','Manual Upload'); g.setValue('summary', this._trunc(a.text,1500));
+    g.setValue('full_text', a.text); g.setValue('status','detected'); g.setValue('impact_level','unknown');
+    g.setValue('is_demo', a.is_demo===true); if(a.authority) g.setValue('authority',this._trunc(a.authority,255));
+    g.setValue('active',true); var id=g.insert();
+    this._event(id,'detected','Manual text/PDF import.');
+    return {ok:true, sys_id:id, title:g.getValue('title')};
+  },
+  getWorkbench: function(a){
+    a=a||{}; var pub=this._pub(a.pubId||a.publication); if(!pub) return {ok:false,error:'not found'};
+    var pid=pub.getUniqueValue();
+    var reqs=[]; var r=new GlideRecord(this.T.req); r.addQuery('publication',pid); r.orderBy('sequence'); r.query(); while(r.next()) reqs.push({sys_id:r.getUniqueValue(), seq:r.getValue('sequence'), text:r.getValue('text'), type:r.getValue('type'), is_obligation:r.getValue('is_obligation')=='1', effective_date:r.getValue('effective_date'), evidence:r.getValue('evidence_ref')});
+    var imps=[]; var im=new GlideRecord(this.T.imp); im.addQuery('publication',pid); im.query(); while(im.next()){ var _rq=''; var _ev=''; var _ob=false; var rqid=im.getValue('requirement'); if(rqid){ var rqg=new GlideRecord(this.T.req); if(rqg.get(rqid)){ _rq=rqg.getValue('text'); _ev=rqg.getValue('evidence_ref'); _ob=(rqg.getValue('is_obligation')=='1'); } } imps.push({sys_id:im.getUniqueValue(), record_type:im.getValue('record_type'), target_label:im.getValue('target_label'), target_table:im.getValue('target_table'), target_id:im.getValue('target_id'), priority:im.getValue('priority'), department:im.getValue('department'), reason:im.getValue('reason'), decision:im.getValue('review_decision'), requirement_id:rqid, obligation:_ob, requirement_text:_rq, evidence:_ev, publication_title:pub.getValue('title'), reviewer:im.getValue('reviewer'), reviewed_on:im.getValue('reviewed_on')}); }
+    var acts=[]; var ac=new GlideRecord(this.T.act); ac.addQuery('publication',pid); ac.query(); while(ac.next()) acts.push({sys_id:ac.getUniqueValue(), task_number:ac.getValue('task_number'), short_description:ac.getValue('short_description'), business_unit:ac.getValue('business_unit'), assigned_to:ac.getValue('assigned_to'), due_date:ac.getValue('due_date'), priority:ac.getValue('priority'), status:ac.getValue('status')});
+    var ras=[]; var ra=new GlideRecord(this.T.ra); ra.addQuery('publication',pid); ra.query(); while(ra.next()) ras.push({sys_id:ra.getUniqueValue(), risk:ra.getDisplayValue('risk'), current_score:ra.getValue('current_score'), proposed_score:ra.getValue('proposed_score'), delta:ra.getValue('delta'), reason:ra.getValue('reason'), recommended_mitigation:ra.getValue('recommended_mitigation'), decision:ra.getValue('review_decision'), approved:ra.getValue('approved')=='1'});
+    var summ=this.getExecutiveRegulatorySummary({pubId:pid, brief:false});
+    return {ok:true, publication:this._pubObj(pub), workflow:this._stage(pid), requirements:reqs, impacts:imps, actions:acts, risk_assessments:ras, counts:summ.counts, events:summ.events};
+  },
+  getKpis: function(a){
+    function cnt(t,q){var g=new GlideAggregate(t); if(q)g.addEncodedQuery(q); g.addAggregate('COUNT'); g.query(); return g.next()?parseInt(g.getAggregate('COUNT'),10):0;}
+    var T=this.T;
+    return { ok:true, generated_on:new GlideDateTime().getValue(), kpis:{
+      publications_total:cnt(T.pub), publications_analyzed:cnt(T.pub,'statusIN analyzed,mapped,reviewed,actions_created,risk_assessed'),
+      requirements:cnt(T.req), obligations:cnt(T.req,'is_obligation=true'),
+      proposed_mappings:cnt(T.imp), accepted_mappings:cnt(T.imp,'review_decisionIN accepted,modified'), rejected_mappings:cnt(T.imp,'review_decision=rejected'),
+      policies_impacted:cnt(T.pol,'reg_impacted=true'), controls_impacted:cnt(T.ctl,'reg_impacted=true'),
+      open_actions:cnt(T.act,'status=open'), completed_actions:cnt(T.act,'status=complete'), total_actions:cnt(T.act),
+      risk_assessments_proposed:cnt(T.ra), risk_assessments_approved:cnt(T.ra,'approved=true')
+    } };
+  },
+  process: function(op, args){
+    try {
+      switch(op){
+        case 'checkRSS': return this.checkRSS(args);
+        case 'analyzeRegulation': return this.analyzeRegulation(args);
+        case 'runImpactAnalysis': return this.runImpactAnalysis(args);
+        case 'saveReviewDecision': return this.saveReviewDecision(args);
+        case 'getKpis': return this.getKpis(args);
+        case 'generateActions': return this.generateActions(args);
+        case 'createTasks': return this.createTasks(args);
+        case 'setActionStatus': return this.setActionStatus(args);
+        case 'assessRisk': return this.assessRisk(args);
+        case 'saveRiskAssessment': return this.saveRiskAssessment(args);
+        case 'getExecutiveRegulatorySummary': return this.getExecutiveRegulatorySummary(args);
+        case 'getPublication': return this.getPublication(args);
+        case 'getWorkbench': return this.getWorkbench(args);
+        case 'importText': return this.importText(args);
+        case 'selfTest': return this.selfTest(args);
+        case 'listPublications': return this.listPublications(args);
+        default: return { ok:false, error:'unknown op: '+op };
+      }
+    } catch(e){ return { ok:false, op:op, error:''+e }; }
+  },
+
+  type: 'RegulatoryIntelligence'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 11:40:52</sys_created_on>
+        <sys_id>2d4c0e5fc3334b10f68a54bf050131fb</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>RegulatoryIntelligence</sys_name>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sys_script_include_2d4c0e5fc3334b10f68a54bf050131fb</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-15 22:47:32</sys_updated_on>
+    </sys_script_include>
+</record_update>

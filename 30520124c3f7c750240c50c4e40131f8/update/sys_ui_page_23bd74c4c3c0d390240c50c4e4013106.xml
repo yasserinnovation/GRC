@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script/>
+        <description/>
+        <direct>true</direct>
+        <endpoint>x_snc_se_grc_vp_0_reg_intel_test.do</endpoint>
+        <html><![CDATA[<html>
+<head>
+<style>
+body{background:#0a1120;color:#e7eef7;font-family:Arial,sans-serif;padding:24px;font-size:16px}
+.ok{color:#34d399;font-weight:bold}
+.bad{color:#f87171;font-weight:bold}
+</style>
+</head>
+<body>
+<h1 class="ok">WORKBENCH TOKEN TEST</h1>
+<div id="l1">4a. OLD gs.getSessionToken() length: [$[gs.getSessionToken()]] (expected 0 = empty)</div>
+<div id="l2">pending...</div>
+<script>
+var oldT="$[gs.getSessionToken()]";
+var newT="$[gs.getSession().getSessionToken() || gs.getSessionToken()]";
+document.getElementById("l1").innerHTML="4a. OLD gs.getSessionToken() length = "+oldT.length;
+document.getElementById("l2").innerHTML=(newT.length>0?"<span class=\"ok\">4b. NEW gs.getSession().getSessionToken() length = "+newT.length+" (PASS)</span>":"<span class=\"bad\">4b. NEW token still empty (FAIL)</span>");
+</script>
+</body>
+</html>]]></html>
+        <name>reg_intel_test</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-15 13:53:12</sys_created_on>
+        <sys_id>23bd74c4c3c0d390240c50c4e4013106</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>reg_intel_test</sys_name>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sys_ui_page_23bd74c4c3c0d390240c50c4e4013106</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-15 13:58:40</sys_updated_on>
+    </sys_ui_page>
+</record_update>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" audit="true" db_object_id="fcebc149a7b7431698a93b9c5e8f30dd" label="Compliance Action" name="x_snc_se_grc_vp_0_reg_action" type="collection">
+        <element label="Description" max_length="4000" name="description" type="string"/>
+        <element display="true" label="Short Description" max_length="255" name="short_description" type="string"/>
+        <element label="Requirement" name="requirement" reference="x_snc_se_grc_vp_0_reg_requirement" reference_cascade_rule="none" type="reference"/>
+        <element label="Related Record" max_length="255" name="related_record" type="string"/>
+        <element default="draft" label="Status" name="status" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="In Progress" sequence="3" value="in_progress"/>
+                <element inactive_on_update="false" label="Draft" sequence="1" value="draft"/>
+                <element inactive_on_update="false" label="Open" sequence="2" value="open"/>
+                <element inactive_on_update="false" label="Completed" sequence="4" value="completed"/>
+            </choice>
+        </element>
+        <element label="Publication" name="publication" reference="x_snc_se_grc_vp_0_reg_publication" reference_cascade_rule="cascade" type="reference"/>
+        <element label="Required Evidence" max_length="1000" name="required_evidence" type="string"/>
+        <element label="Business Unit" max_length="120" name="business_unit" type="string"/>
+        <element default="medium" label="Priority" name="priority" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Low" sequence="1" value="low"/>
+                <element inactive_on_update="false" label="Medium" sequence="2" value="medium"/>
+                <element inactive_on_update="false" label="High" sequence="3" value="high"/>
+                <element inactive_on_update="false" label="Critical" sequence="4" value="critical"/>
+            </choice>
+        </element>
+        <element label="Due Date" name="due_date" type="glide_date"/>
+        <element label="Task Number" max_length="40" name="task_number" type="string"/>
+        <element label="Assigned To" max_length="120" name="assigned_to" type="string"/>
+        <element label="Impact" name="impact" reference="x_snc_se_grc_vp_0_reg_impact" reference_cascade_rule="none" type="reference"/>
+        <index name="index">
+            <element name="impact"/>
+        </index>
+        <index name="index2">
+            <element name="publication"/>
+        </index>
+        <index name="index3">
+            <element name="requirement"/>
+        </index>
+    </element>
+</database>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json,application/xml,text/xml</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri/>
+        <enforce_acl/>
+        <http_method>GET</http_method>
+        <name>Execute (GET)</name>
+        <operation_script><![CDATA[(function process(request, response){
+  var api = new x_snc_se_grc_vp_0.RegulatoryIntelligence();
+  var op, args={};
+  if (request.getHeader && (''+request.getHeader('Content-Type')).indexOf('json')>=0) {}
+  try {
+    var data = request.body ? request.body.data : null;
+    if (data) { op = data.op; args = data.args || {}; }
+  } catch(e){}
+  if (!op) { op = request.queryParams.op ? ''+request.queryParams.op : null; }
+  if (!op) {
+    var p = request.queryParams.pubId || request.queryParams.pub;
+    if (p) args.pubId = ''+p;
+    var lim = request.queryParams.limit; if (lim) args.limit = parseInt(''+lim,10);
+  }
+  // allow simple GET args via query params
+  if (request.queryParams.pubId && !args.pubId) args.pubId = ''+request.queryParams.pubId;
+  if (request.queryParams.demo) args.demo = (''+request.queryParams.demo==='true');
+  if (request.queryParams.feed) args.feed = ''+request.queryParams.feed;
+  if (!op) return { ok:false, error:'Missing op. POST {op, args} or GET ?op=...' };
+  return api.process(op, args);
+})(request, response);]]></operation_script>
+        <operation_uri>/api/x_snc_champion_i_0/reg_intel/v1/execute</operation_uri>
+        <produces>application/json,application/xml,text/xml</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/v1/execute</relative_path>
+        <request_example/>
+        <requires_acl_authorization>false</requires_acl_authorization>
+        <requires_authentication>true</requires_authentication>
+        <requires_snc_internal_role>true</requires_snc_internal_role>
+        <short_description/>
+        <support_trailing_slash>false</support_trailing_slash>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 11:48:52</sys_created_on>
+        <sys_id>261e42dbc3734b10f68a54bf0501318a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Execute (GET)</sys_name>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sys_ws_operation_261e42dbc3734b10f68a54bf0501318a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-13 11:48:52</sys_updated_on>
+        <web_service_definition display_value="Regulatory Intelligence API">2e1e4e1bc3734b10f68a54bf05013124</web_service_definition>
+        <web_service_version/>
+    </sys_ws_operation>
+</record_update>

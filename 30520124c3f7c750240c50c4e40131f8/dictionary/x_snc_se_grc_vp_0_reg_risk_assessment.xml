@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" audit="true" db_object_id="06516f8fef69483b9dc466bf7579e43d" label="Regulatory Risk Reassessment" name="x_snc_se_grc_vp_0_reg_risk_assessment" type="collection">
+        <element label="Current Score" name="current_score" type="integer"/>
+        <element label="Approved" name="approved" type="boolean"/>
+        <element label="Proposed Score" name="proposed_score" type="integer"/>
+        <element display="true" label="Reason" max_length="2000" name="reason" type="string"/>
+        <element label="Delta" name="delta" type="integer"/>
+        <element label="Related Controls" max_length="1000" name="related_controls" type="string"/>
+        <element label="Risk" name="risk" reference="x_snc_se_grc_vp_0_grc_risk" reference_cascade_rule="none" type="reference"/>
+        <element label="Recommended Mitigation" max_length="1000" name="recommended_mitigation" type="string"/>
+        <element label="Reviewer" max_length="120" name="reviewer" type="string"/>
+        <element label="Reviewed On" name="reviewed_on" type="glide_date_time"/>
+        <element label="Publication" name="publication" reference="x_snc_se_grc_vp_0_reg_publication" reference_cascade_rule="cascade" type="reference"/>
+        <element default="pending" label="Review Decision" name="review_decision" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Rejected" sequence="4" value="rejected"/>
+                <element inactive_on_update="false" label="Modified" sequence="3" value="modified"/>
+                <element inactive_on_update="false" label="Accepted" sequence="2" value="accepted"/>
+                <element inactive_on_update="false" label="Pending" sequence="1" value="pending"/>
+            </choice>
+        </element>
+        <index name="index">
+            <element name="publication"/>
+        </index>
+        <index name="index2">
+            <element name="risk"/>
+        </index>
+    </element>
+</database>

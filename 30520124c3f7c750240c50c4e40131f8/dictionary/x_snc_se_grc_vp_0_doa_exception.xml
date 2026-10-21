@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="984dbedaeaea47f683ed7af7309db6bb" label="DoA Exception" name="x_snc_se_grc_vp_0_doa_exception" type="collection">
+        <element label="Owner" max_length="120" name="owner" type="string"/>
+        <element label="Entity" max_length="120" name="entity" type="string"/>
+        <element label="Obligation" name="requirement" reference="x_snc_se_grc_vp_0_reg_requirement" reference_cascade_rule="none" type="reference"/>
+        <element label="Reason" max_length="4000" name="reason" type="multi_two_lines"/>
+        <element label="Reviewed On" name="reviewed_on" type="glide_date_time"/>
+        <element label="Approver Role" max_length="120" name="approver_role" type="string"/>
+        <element label="Transaction Type" max_length="120" name="transaction_type" type="string"/>
+        <element label="Risk" name="risk" reference="x_snc_se_grc_vp_0_grc_risk" reference_cascade_rule="none" type="reference"/>
+        <element label="Control" name="control" reference="x_snc_se_grc_vp_0_grc_control" reference_cascade_rule="none" type="reference"/>
+        <element label="Reviewer" max_length="120" name="reviewer" type="string"/>
+        <element default="open" label="Status" max_length="40" name="status" type="string"/>
+        <element label="Remediation Task" name="task" reference="x_snc_se_grc_vp_0_reg_action" reference_cascade_rule="none" type="reference"/>
+        <element label="Regulatory Publication" name="publication" reference="x_snc_se_grc_vp_0_reg_publication" reference_cascade_rule="none" type="reference"/>
+        <element label="Business Unit" max_length="120" name="business_unit" type="string"/>
+        <element label="Suggested Correction" max_length="2000" name="suggested_correction" type="multi_two_lines"/>
+        <element label="Dedupe Key" max_length="255" name="dedupe_key" type="string"/>
+        <element default="javascript:getNextObjNumberPadded();" label="Number" max_length="40" name="number" type="string"/>
+        <element label="DoA Rule" name="doa_rule" reference="x_snc_se_grc_vp_0_doa_rule" reference_cascade_rule="none" type="reference"/>
+        <element label="Issue Type" max_length="60" name="issue_type" type="string"/>
+        <element label="Policy" name="policy" reference="x_snc_se_grc_vp_0_grc_policy" reference_cascade_rule="none" type="reference"/>
+        <element default="true" label="Is Demo" name="is_demo" type="boolean"/>
+        <element label="Amount" name="amount" type="decimal"/>
+        <element label="Short Description" max_length="255" name="short_description" type="string"/>
+        <element default="medium" label="Priority" max_length="20" name="priority" type="string"/>
+        <index name="index">
+            <element name="control"/>
+        </index>
+        <index name="index2">
+            <element name="doa_rule"/>
+        </index>
+        <index name="index3">
+            <element name="policy"/>
+        </index>
+        <index name="index4">
+            <element name="publication"/>
+        </index>
+        <index name="index5">
+            <element name="requirement"/>
+        </index>
+        <index name="index6">
+            <element name="risk"/>
+        </index>
+        <index name="index7">
+            <element name="task"/>
+        </index>
+    </element>
+</database>

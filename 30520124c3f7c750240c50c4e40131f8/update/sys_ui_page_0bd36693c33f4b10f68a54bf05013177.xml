@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script/>
+        <description/>
+        <direct>true</direct>
+        <endpoint>x_snc_se_grc_vp_0_reg_intel_workbench.do</endpoint>
+        <html><![CDATA[
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Regulatory Change Intelligence</title>
+<style>
+.grc-light{--grc-bg:240,243,247;--grc-surface:255,255,255;--grc-surface2:247,249,252;--grc-raised:255,255,255;--grc-sunken:247,249,252;--grc-border:222,228,236;--grc-text:18,28,42;--grc-muted:82,96,118;--grc-faint:130,144,165;--grc-primary:0,113,188;--grc-ai:124,92,219;--grc-crit:214,48,49;--grc-high:201,123,0;--grc-healthy:30,150,90;--grc-info:0,113,188;}
+.themebtn{position:fixed;top:14px;right:16px;z-index:60;background:rgb(var(--grc-surface2));color:rgb(var(--grc-text));border:1px solid rgb(var(--grc-border));border-radius:7px;padding:6px 11px;font-size:12px;cursor:pointer}
+[dir="rtl"]{text-align:right}
+
+:root{--grc-bg:15,20,32;--grc-surface:23,30,46;--grc-surface2:30,39,59;--grc-raised:34,44,66;--grc-sunken:11,21,38;--grc-border:44,56,82;--grc-text:232,237,245;--grc-muted:148,163,193;--grc-faint:108,122,150;--grc-primary:56,139,253;--grc-ai:167,139,250;--grc-crit:248,81,73;--grc-high:245,158,11;--grc-healthy:46,204,113;--grc-info:56,139,253;}
+body{font-family:"Lato",Arial,sans-serif !important;}
+
+html,body{margin:0;padding:0;background:rgb(var(--grc-bg));color:rgb(var(--grc-text));font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px}
+.wrap{max-width:1280px;margin:0 auto;padding:18px 22px 60px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid rgb(var(--grc-border));padding-bottom:14px;margin-bottom:14px}
+.crumb{color:#7f93b2;font-size:12px;margin-bottom:6px}
+.crumb b{color:#aebcd6}
+.h1{font-size:20px;font-weight:700;letter-spacing:.2px}
+.sub{color:#93a4bd;font-size:12px;margin-top:3px}
+.badge{display:inline-block;padding:2px 9px;border-radius:11px;font-size:11px;font-weight:600;margin-left:6px}
+.badge.live{background:#07331f;color:#34d399;border:1px solid #10b981}
+.badge.demo{background:#3a2a06;color:#fbbf24;border:1px solid #f59e0b}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.btn{background:rgb(var(--grc-surface2));color:#dbe6f7;border:1px solid rgb(var(--grc-border));border-radius:7px;padding:8px 13px;font-size:13px;cursor:pointer;transition:.15s}
+.btn:hover{background:#1e2d49}
+.btn.primary{background:rgb(var(--grc-primary));border-color:rgb(var(--grc-primary));color:#fff}
+.btn.primary:hover{background:#255fd0}
+.btn.ai{background:rgb(var(--grc-ai));border-color:rgb(var(--grc-ai));color:#fff}
+.btn.ai:hover{background:rgb(var(--grc-ai))}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.stepper{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.step{flex:1;min-width:110px;background:rgb(var(--grc-surface));border:1px solid rgb(var(--grc-border));border-radius:7px;padding:8px 10px;font-size:12px;color:#7f93b2;position:relative}
+.step .n{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.step.done{background:#10233f;border-color:rgb(var(--grc-primary));color:#cfe0ff}
+.step.done .n{color:#6ea0ff}
+.layout{display:grid;grid-template-columns:320px 1fr;gap:16px}
+.panel{background:rgb(var(--grc-surface));border:1px solid rgb(var(--grc-border));border-radius:10px;padding:14px}
+.panel h3{margin:0 0 10px;font-size:13px;color:#aebcd6;text-transform:uppercase;letter-spacing:.5px}
+.pub{border:1px solid rgb(var(--grc-border));border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;background:rgb(var(--grc-surface2))}
+.pub:hover{border-color:rgb(var(--grc-primary))}
+.pub.sel{border-color:rgb(var(--grc-primary));background:rgb(var(--grc-raised))}
+.pub .t{font-size:13px;font-weight:600;line-height:1.3;color:#eaf1fb}
+.pub .m{font-size:11px;color:#7f93b2;margin-top:4px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid rgb(var(--grc-border));margin-bottom:14px;flex-wrap:wrap}
+.tab{padding:8px 13px;font-size:13px;color:#93a4bd;cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:#fff;border-bottom-color:rgb(var(--grc-ai))}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:rgb(var(--grc-surface2));border:1px solid rgb(var(--grc-border));border-radius:9px;padding:12px}
+.kpi .v{font-size:24px;font-weight:700;color:#eaf1fb}
+.kpi .l{font-size:11px;color:#7f93b2;margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+.row{border:1px solid rgb(var(--grc-border));border-radius:8px;padding:11px;margin-bottom:9px;background:rgb(var(--grc-surface2))}
+.row .top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.row .ttl{font-weight:600;color:#eaf1fb;font-size:13px}
+.row .meta{font-size:12px;color:#8aa0c0;margin-top:5px;line-height:1.45}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.pill.high,.pill.critical{background:#3a0d0d;color:#f87171;border:1px solid #ef4444}
+.pill.medium{background:#3a2a06;color:#fbbf24;border:1px solid #f59e0b}
+.pill.low{background:#07331f;color:#34d399;border:1px solid #10b981}
+.pill.policy{background:#0d2440;color:#7fb0ff;border:1px solid rgb(var(--grc-primary))}
+.pill.control{background:#1f1540;color:#b79cff;border:1px solid rgb(var(--grc-ai))}
+.pill.risk{background:#3a0d0d;color:#f87171;border:1px solid #ef4444}
+.pill.accepted{background:#07331f;color:#34d399;border:1px solid #10b981}
+.pill.modified{background:#3a2a06;color:#fbbf24;border:1px solid #f59e0b}
+.pill.rejected{background:#3a0d0d;color:#f87171;border:1px solid #ef4444}
+.pill.pending,.pill.detected,.pill.draft{background:#1a2740;color:#9fb3d4;border:1px solid #33496e}
+.pill.open,.pill.analyzed,.pill.mapped,.pill.reviewed{background:#0d2440;color:#7fb0ff;border:1px solid rgb(var(--grc-primary))}
+.mini{font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid rgb(var(--grc-border));background:rgb(var(--grc-surface2));color:#dbe6f7;cursor:pointer;margin-left:5px}
+.mini.a{border-color:#10b981;color:#34d399}
+.mini.m{border-color:#f59e0b;color:#fbbf24}
+.mini.r{border-color:#ef4444;color:#f87171}
+.src{font-size:13px;line-height:1.6;color:rgb(var(--grc-text));white-space:pre-wrap;max-height:360px;overflow:auto;background:rgb(var(--grc-sunken));border:1px solid rgb(var(--grc-border));border-radius:8px;padding:12px;direction:auto}
+.kv{display:flex;gap:8px;margin:4px 0;font-size:13px}
+.kv .k{color:#7f93b2;min-width:120px}
+.brief .b{background:rgb(var(--grc-surface2));border:1px solid rgb(var(--grc-border));border-left:3px solid rgb(var(--grc-ai));border-radius:8px;padding:11px;margin-bottom:8px}
+.brief .b .k{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#b79cff;margin-bottom:4px}
+.feed .e{font-size:12px;color:#9fb3d4;padding:7px 0;border-bottom:1px solid #1a2740}
+.feed .e .ty{color:#6ea0ff;font-weight:600}
+.empty{color:#6a7f9e;font-size:13px;padding:20px;text-align:center}
+.toast{position:fixed;bottom:20px;right:20px;background:rgb(var(--grc-raised));border:1px solid rgb(var(--grc-primary));color:#eaf1fb;padding:12px 16px;border-radius:8px;max-width:380px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:99;display:none}
+.toast.err{border-color:#ef4444}
+.spin{color:#6ea0ff;font-size:12px}
+.modal{position:fixed;inset:0;background:rgba(5,10,20,.7);display:none;align-items:center;justify-content:center;z-index:50}
+.modal .box{background:rgb(var(--grc-surface));border:1px solid rgb(var(--grc-border));border-radius:10px;padding:18px;width:560px;max-width:92vw}
+.modal textarea{width:100%;height:150px;background:rgb(var(--grc-sunken));color:rgb(var(--grc-text));border:1px solid rgb(var(--grc-border));border-radius:7px;padding:10px;font-size:13px;box-sizing:border-box}
+.modal input{width:100%;background:rgb(var(--grc-sunken));color:rgb(var(--grc-text));border:1px solid rgb(var(--grc-border));border-radius:7px;padding:9px;font-size:13px;box-sizing:border-box;margin-bottom:8px}
+
+/*LIGHTFIX*/.grc-light .pub .t,.grc-light .kpi .v,.grc-light .row .ttl,.grc-light .src,.grc-light .h1{color:rgb(18,28,42) !important;}.grc-light .crumb,.grc-light .crumb b,.grc-light .sub,.grc-light .panel h3,.grc-light .tab,.grc-light .pub .m,.grc-light .kpi .l,.grc-light .kv .k,.grc-light .row .meta{color:rgb(82,96,118) !important;}.grc-light .empty{color:rgb(130,144,165) !important;}.grc-light .btn{color:rgb(18,28,42);}.grc-light .btn.primary,.grc-light .btn.ai{color:#fff;}.grc-light .tab.active{color:rgb(0,113,188) !important;}.grc-light .pub,.grc-light .row,.grc-light .kpi,.grc-light .panel{box-shadow:0 1px 4px rgba(31,45,70,.08);}
+</style>
+</head>
+<body>
+<button id="themeBtn" class="themebtn" onclick="toggleTheme()">◑ Theme</button>
+<div class="wrap">
+  <div class="hdr">
+    <div>
+      <a href="/x_snc_se_grc_vp_0_command_center.do?tab=ai" style="color:#6ea0ff;text-decoration:none;font-size:12px;display:inline-block;margin-bottom:8px">← Back to Command Center</a><div class="crumb">GRC VP Command Center › AI Insights and Actions › <b>Regulatory Impact</b> › Change Details</div>
+      <div class="h1">Regulatory Change Intelligence</div>
+      <div class="sub" id="subTitle">Umm Al-Qura regulatory monitoring, AI analysis and GRC impact</div>
+    </div>
+    <div style="text-align:right"><div class="sub">Impact level</div><div id="impactLevel" class="h1" style="font-size:16px">-</div></div>
+  </div>
+  <div class="toolbar" id="toolbar"></div>
+  <div class="stepper" id="stepper"></div>
+  <div class="cards" id="kpiStrip" style="margin-bottom:16px"></div>
+  <div class="layout">
+    <div class="panel">
+      <h3>Latest Publications</h3>
+      <div id="pubList"><div class="empty">Loading...</div></div>
+    </div>
+    <div class="panel">
+      <div class="tabs" id="tabs"></div>
+      <div id="tabBody"><div class="empty">Select a publication to begin.</div></div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="modal"><div class="box">
+  <h3 style="margin-top:0;color:#aebcd6">Import regulatory text (PDF fallback)</h3>
+  <input id="impTitle" placeholder="Title"/>
+  <textarea id="impText" placeholder="Paste the full regulatory text here..."></textarea>
+  <div style="margin-top:10px;text-align:right">
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn primary" onclick="doImport()">Import and Select</button>
+  </div>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>window.G_CK="$[gs.getSession().getSessionToken() || gs.getSessionToken()]";</script>
+<script>
+
+var BASE='/api/x_snc_champion_i_0/reg_intel/v1/execute';
+var S={pubs:[],sel:null,wb:null,tab:'Overview'};
+function applyTheme(t){try{document.body.classList.remove('grc-light');if(t==='light'){document.body.classList.add('grc-light');}localStorage.setItem('grcTheme',t);var b=document.getElementById('themeBtn');if(b){b.innerHTML=(t==='light'?'◑ Dark':'◐ Light');}}catch(e){}}function toggleTheme(){var cur=(localStorage.getItem('grcTheme')||'light');applyTheme(cur==='light'?'dark':'light');}(function(){var q=(location.search||'');var t=null;var m=q.match(/theme=(light|dark)/);if(m){t=m[1];}else{t=localStorage.getItem('grcTheme')||'light';}applyTheme(t);})();
+var TABS=['Overview','Source','AI Analysis','GRC Impact','Actions','Risk','Executive'];
+function toast(msg,err){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' err':'');t.style.display='block';setTimeout(function(){t.style.display='none';},err?6000:3500);}
+function call(op,args){return fetch(BASE,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json','X-UserToken':window.G_CK},body:JSON.stringify({op:op,args:args||{}})}).then(function(r){if(!r.ok){return r.text().then(function(t){return {ok:false,error:'HTTP '+r.status,_raw:(t||'').substring(0,160)};});}return r.json();}).then(function(j){var d=(j$[AMP]$[AMP]j.result)?j.result:j;if(d$[AMP]$[AMP]d.ok===false)toast((d.error||'Operation failed')+(d.hint?(' '+d.hint):''),true);return d;}).catch(function(e){toast('Network error: '+e,true);return {ok:false,error:''+e};});}
+function esc(s){s=(s==null?'':''+s);return s.split('$[AMP]').join('$[AMP]amp;').split('<').join('$[AMP]lt;').split('>').join('$[AMP]gt;');}
+function pill(v,cls){return '<span class="pill '+(cls||v)+'">'+esc(v)+'</span>';}
+function busy(id){var b=document.getElementById(id);if(b){b.disabled=true;b.dataset.t=b.textContent;b.textContent='Working...';}}
+function unbusy(id){var b=document.getElementById(id);if(b){b.disabled=false;if(b.dataset.t)b.textContent=b.dataset.t;}}
+
+function renderToolbar(){
+  var sel=!!S.sel;
+  var defs=[
+    ['Check RSS','primary',"checkRSS()",false],
+    ['Demo RSS','ghost',"demoRSS()",false],
+    ['Import Text / PDF','ghost',"openModal()",false],
+    ['Analyze with AI','ai',"act('analyzeRegulation','Analyze with AI')",!sel],
+    ['Run Impact Analysis','ai',"act('runImpactAnalysis','Run Impact Analysis')",!sel],
+    ['Generate Actions','ai',"act('generateActions','Generate Actions')",!sel],
+    ['Create Tasks','primary',"act('createTasks','Create Tasks')",!sel],
+    ['Assess Risk','ai',"act('assessRisk','Assess Risk')",!sel]
+  ];
+  var h='';for(var i=0;i<defs.length;i++){var d=defs[i];h+='<button id="tb'+i+'" class="btn '+(d[1]==='ghost'?'':d[1])+'" '+(d[3]?'disabled':'')+' onclick="'+d[2]+'">'+d[0]+'</button>';}
+  document.getElementById('toolbar').innerHTML=h;
+}
+function renderStepper(){
+  var order=[['detected','Detected'],['analyzed','Analyzed'],['mapped','Mapped'],['reviewed','Reviewed'],['actions_created','Actions Created'],['risk_assessed','Risk Assessed']];
+  var cur=S.wb$[AMP]$[AMP]S.wb.workflow?S.wb.workflow.current:null;var oi=-1;for(var i=0;i<order.length;i++)if(order[i][0]===cur)oi=i;
+  var h='';for(var j=0;j<order.length;j++){h+='<div class="step'+(j<=oi?' done':'')+'"><div class="n">Step '+(j+1)+'</div>'+order[j][1]+'</div>';}
+  document.getElementById('stepper').innerHTML=h;
+}
+function renderTabs(){var h='';for(var i=0;i<TABS.length;i++){h+='<div class="tab'+(TABS[i]===S.tab?' active':'')+'" onclick="setTab(\''+TABS[i]+'\')">'+TABS[i]+'</div>';}document.getElementById('tabs').innerHTML=h;}
+function setTab(t){S.tab=t;renderTabs();renderBody();}
+
+function renderList(){
+  if(!S.pubs.length){document.getElementById('pubList').innerHTML='<div class="empty">No publications. Click Check RSS or Demo RSS.</div>';return;}
+  var h='';for(var i=0;i<S.pubs.length;i++){var p=S.pubs[i];h+='<div class="pub'+(p.sys_id===S.sel?' sel':'')+'" onclick="selectPub(\''+p.sys_id+'\')"><div class="t" dir="auto">'+esc(p.title)+'</div><div class="m">'+esc(p.category||'')+' · '+esc(p.publication_date||'')+' '+(p.is_demo?'<span class="badge demo">DEMO</span>':'<span class="badge live">LIVE</span>')+'</div></div>';}
+  document.getElementById('pubList').innerHTML=h;
+}
+function renderBody(){
+  var el=document.getElementById('tabBody');
+  if(!S.wb){el.innerHTML='<div class="empty">Select a publication to begin.</div>';return;}
+  var w=S.wb,p=w.publication,c=w.counts||{};
+  if(S.tab==='Overview'){
+    var cards=[['requirements','Requirements'],['obligations','New Obligations'],['impacted_policies','Impacted Policies'],['impacted_controls','Impacted Controls'],['impacted_departments','Impacted Depts'],['impacted_risks','Related Risks'],['open_actions','Open Actions']];
+    var h='<div class="cards">';for(var i=0;i<cards.length;i++)h+='<div class="kpi"><div class="v">'+(c[cards[i][0]]!=null?c[cards[i][0]]:0)+'</div><div class="l">'+cards[i][1]+'</div></div>';h+='</div>';
+    h+='<div class="row"><div class="ttl" dir="auto">'+esc(p.title)+'</div><div class="meta">'+esc(p.summary||'')+'</div></div>';
+    el.innerHTML=h;
+  } else if(S.tab==='Source'){
+    var h='<div class="kv"><div class="k">Title</div><div>'+esc(p.title)+'</div></div>';
+    h+='<div class="kv"><div class="k">Authority</div><div>'+esc(p.authority||'-')+'</div></div>';
+    h+='<div class="kv"><div class="k">Source</div><div>'+esc(p.source_label||p.source)+' '+(p.is_demo?'<span class="badge demo">DEMONSTRATION</span>':'<span class="badge live">LIVE</span>')+'</div></div>';
+    h+='<div class="kv"><div class="k">Published</div><div>'+esc(p.publication_date||'-')+'</div></div>';
+    h+='<div class="kv"><div class="k">Language</div><div>'+esc(p.language||'-')+'</div></div>';
+    if(p.source_url)h+='<div class="kv"><div class="k">Link</div><div><a href="'+esc(p.source_url)+'" target="_blank" style="color:#6ea0ff">Open original</a></div></div>';
+    h+='<h3 style="margin-top:14px;color:#aebcd6">Source text</h3><div class="src">'+esc(p.summary||'(no text)')+'</div>';
+    el.innerHTML=h;
+  } else if(S.tab==='AI Analysis'){
+    if(!w.requirements.length){el.innerHTML='<div class="empty">No analysis yet. Click Analyze with AI.</div>';return;}
+    var h='<div class="sub" style="margin-bottom:10px">AI relevance '+esc(p.ai_relevance||'-')+' / 100 · impact '+esc(p.impact_level)+'</div>';
+    for(var i=0;i<w.requirements.length;i++){var r=w.requirements[i];h+='<div class="row"><div class="top"><div class="ttl" dir="auto">R'+r.seq+'. '+esc(r.text)+'</div><div>'+pill(r.type,'low')+(r.is_obligation?' '+pill('obligation','control'):'')+'</div></div>'+(r.evidence?'<div class="meta">Evidence: '+esc(r.evidence)+(r.effective_date?(' · effective '+esc(r.effective_date)):'')+'</div>':'')+'</div>';}
+    el.innerHTML=h;
+  } else if(S.tab==='GRC Impact'){
+    if(!w.impacts.length){el.innerHTML='<div class="empty">No impact mappings yet. Click Run Impact Analysis.</div>';return;}
+    var h='';for(var i=0;i<w.impacts.length;i++){var m=w.impacts[i];var chain='<div class="meta" style="margin-top:6px"><b style="color:#b79cff">Traceability:</b> '+esc(m.publication_title||p.title)+' → '+(m.obligation?'Obligation':'Requirement')+' → '+pill(m.record_type,m.record_type)+' '+esc(m.target_label)+(m.department?(' → '+esc(m.department)):'')+'</div>';var reqline=m.requirement_text?('<div class="meta" dir="auto"><b>Obligation:</b> '+esc(m.requirement_text)+'</div>'):'';var evline=m.evidence?('<div class="meta"><b>Evidence:</b> '+esc(m.evidence)+'</div>'):'';var aireason='<div class="meta"><b>AI reasoning:</b> '+esc(m.reason)+'</div>';var revline=(m.decision&&m.decision!=='pending')?('<div class="meta" style="color:#7f93b2">Decision: '+esc(m.decision)+(m.reviewer?(' by '+esc(m.reviewer)):'')+(m.reviewed_on?(' on '+esc(m.reviewed_on)):'')+'</div>'):'';h+='<div class="row"><div class="top"><div class="ttl" dir="auto">'+pill(m.record_type,m.record_type)+' '+esc(m.target_label)+'</div><div>'+pill(m.priority,m.priority)+' '+pill(m.decision,m.decision)+'</div></div>'+chain+reqline+evline+aireason+revline+'<div style="margin-top:8px"><button class="mini a" onclick="decide(\''+m.sys_id+'\',\'accepted\')">Accept</button><button class="mini m" onclick="decide(\''+m.sys_id+'\',\'modified\')">Modify</button><button class="mini r" onclick="decide(\''+m.sys_id+'\',\'rejected\')">Reject</button></div></div>';}
+    el.innerHTML=h;
+  } else if(S.tab==='Actions'){
+    if(!w.actions.length){el.innerHTML='<div class="empty">No actions yet. Accept mappings, then Generate Actions and Create Tasks.</div>';return;}
+    var h='';for(var i=0;i<w.actions.length;i++){var a=w.actions[i];h+='<div class="row"><div class="top"><div class="ttl" dir="auto">'+(a.task_number?('['+esc(a.task_number)+'] '):'')+esc(a.short_description)+'</div><div>'+pill(a.priority,a.priority)+' '+pill(a.status,a.status)+'</div></div><div class="meta">Owner: '+esc(a.assigned_to||'-')+' · BU: '+esc(a.business_unit||'-')+' · Due: '+esc(a.due_date||'-')+'</div></div>';}
+    el.innerHTML=h;
+  } else if(S.tab==='Risk'){
+    if(!w.risk_assessments.length){el.innerHTML='<div class="empty">No risk reassessment yet. Click Assess Risk.</div>';return;}
+    var h='';for(var i=0;i<w.risk_assessments.length;i++){var ra=w.risk_assessments[i];var dl=parseInt(ra.delta,10);h+='<div class="row"><div class="top"><div class="ttl" dir="auto">'+esc(ra.risk)+'</div><div>'+pill(ra.decision,ra.decision)+(ra.approved?' '+pill('approved','accepted'):'')+'</div></div><div class="meta">Current '+esc(ra.current_score)+' → Proposed '+esc(ra.proposed_score)+' ('+(dl>0?'+':'')+esc(ra.delta)+') · '+esc(ra.reason)+'</div>'+(ra.recommended_mitigation?'<div class="meta">Mitigation: '+esc(ra.recommended_mitigation)+'</div>':'')+(ra.decision==='pending'?'<div style="margin-top:8px"><button class="mini a" onclick="acceptRisk(\''+ra.sys_id+'\')">Accept</button><button class="mini r" onclick="rejectRisk(\''+ra.sys_id+'\')">Reject</button></div>':'')+'</div>';}
+    el.innerHTML=h+'<div class="sub" style="margin-top:8px">Note: authoritative enterprise risk scores are not changed; the approved assessment is stored as a linked record.</div>';
+  } else if(S.tab==='Executive'){
+    var h='<button class="btn ai" id="briefBtn" onclick="genBrief()">Generate Executive Brief</button><div id="briefBox" style="margin-top:12px"></div>';
+    h+='<h3 style="margin-top:16px;color:#aebcd6">Change feed</h3><div class="feed">';
+    var ev=w.events||[];if(!ev.length)h+='<div class="empty">No events.</div>';for(var i=0;i<ev.length;i++)h+='<div class="e"><span class="ty">'+esc(ev[i].type)+'</span> · '+esc(ev[i].message)+' <span style="color:#5a6f8e">('+esc(ev[i].when)+')</span></div>';
+    h+='</div>';el.innerHTML=h;
+  }
+}
+function renderAll(){document.getElementById('impactLevel').textContent=S.wb$[AMP]$[AMP]S.wb.publication?(S.wb.publication.impact_level||'-'):'-';renderToolbar();renderStepper();renderTabs();renderBody();}
+
+function loadPubs(cb){var pl=document.getElementById('pubList');pl.innerHTML='<div class="empty">Loading…</div>';call('listPublications',{limit:50}).then(function(d){if(d){if(d.publications){S.pubs=d.publications;renderList();}else{pl.innerHTML='<div class="empty">Could not load publications'+(d.error?(': '+esc(d.error)):'')+'</div>';}}if(cb)cb();});}
+function selectPub(id){S.sel=id;renderList();document.getElementById('tabBody').innerHTML='<div class="empty spin">Loading publication...</div>';call('getWorkbench',{pubId:id}).then(function(d){if(d$[AMP]$[AMP]d.ok){S.wb=d;renderAll();}});}
+function reload(){if(S.sel)return call('getWorkbench',{pubId:S.sel}).then(function(d){if(d$[AMP]$[AMP]d.ok){S.wb=d;renderAll();}});}
+function act(op,label){if(!S.sel){toast('Select a publication first',true);return;}toast(label+' running...');call(op,{pubId:S.sel}).then(function(d){if(d$[AMP]$[AMP]d.ok!==false){var n=d.requirements_count!=null?d.requirements_count+' requirements':(d.mappings_count!=null?d.mappings_count+' mappings':(d.actions_count!=null?d.actions_count+' actions':(d.tasks_created!=null?d.tasks_created+' tasks':(d.assessments_count!=null?d.assessments_count+' assessments':'done'))));toast(label+': '+n);}reload();});}
+function decide(id,dec){call('saveReviewDecision',{impactId:id,decision:dec,reviewer:'poc.analyst'}).then(function(d){if(d$[AMP]$[AMP]d.ok)toast('Decision saved: '+dec);reload();});}
+function acceptRisk(id){call('saveRiskAssessment',{assessmentId:id,decision:'accepted',reviewer:'poc.vp'}).then(function(d){if(d$[AMP]$[AMP]d.ok)toast('Risk assessment approved');reload();});}
+function rejectRisk(id){call('saveRiskAssessment',{assessmentId:id,decision:'rejected',reviewer:'poc.vp'}).then(function(d){if(d$[AMP]$[AMP]d.ok)toast('Risk assessment rejected');reload();});}
+function checkRSS(){toast('Checking live Umm Al-Qura feed...');call('checkRSS',{feed:'decisions',max:10}).then(function(d){if(d$[AMP]$[AMP]d.ok)toast('Live RSS: '+d.created_count+' new, '+d.duplicates+' duplicates');loadPubs();});}
+function demoRSS(){call('checkRSS',{demo:true}).then(function(d){if(d$[AMP]$[AMP]d.ok)toast('Demo RSS: '+d.created_count+' created (labeled DEMO)');loadPubs();});}
+function genBrief(){if(!S.sel)return;busy('briefBtn');call('getExecutiveRegulatorySummary',{pubId:S.sel,brief:true}).then(function(d){unbusy('briefBtn');var b=d$[AMP]$[AMP]d.executive_brief?d.executive_brief:null;var box=document.getElementById('briefBox');if(!b||b._error){box.innerHTML='<div class="empty">Brief unavailable.</div>';return;}var keys=[['what_happened','What happened'],['why_it_matters','Why it matters'],['what_is_impacted','What is impacted'],['business_exposure','Business exposure'],['actions_underway','Actions underway'],['decisions_needed','Decisions needed']];var h='<div class="brief">';for(var i=0;i<keys.length;i++)if(b[keys[i][0]])h+='<div class="b"><div class="k">'+keys[i][1]+'</div>'+esc(b[keys[i][0]])+'</div>';h+='</div>';box.innerHTML=h;});}
+function openModal(){document.getElementById('modal').style.display='flex';}
+function closeModal(){document.getElementById('modal').style.display='none';}
+function doImport(){var t=document.getElementById('impTitle').value,x=document.getElementById('impText').value;if(!x){toast('Paste some text',true);return;}closeModal();call('importText',{title:t,text:x}).then(function(d){if(d$[AMP]$[AMP]d.ok){toast('Imported publication');document.getElementById('impText').value='';document.getElementById('impTitle').value='';loadPubs(function(){selectPub(d.sys_id);});}});}
+function loadKpis(){call('getKpis',{}).then(function(d){if(!d||!d.kpis){return;}var k=d.kpis;var defs=[['policies_impacted','Policies Impacted'],['controls_impacted','Controls Impacted'],['open_actions','Open Actions'],['accepted_mappings','Approved Mappings'],['risk_assessments_approved','Risk Reassessments'],['publications_analyzed','Analyzed Publications']];var h='';for(var i=0;i<defs.length;i++){h+='<div class="kpi"><div class="v">'+(k[defs[i][0]]!=null?k[defs[i][0]]:0)+'</div><div class="l">'+defs[i][1]+'</div></div>';}document.getElementById('kpiStrip').innerHTML=h;});}
+renderToolbar();renderStepper();renderTabs();loadPubs();loadKpis();if((location.search||'').indexOf('selftest')>=0){call('selfTest',{nonce:'UIDIAG'+Date.now()}).then(function(d){if(d$[AMP]$[AMP]d.ok)toast('Self-test logged '+d.logged);});}
+
+</script>
+<!-- KPIDRILL-START (reversible: delete this block) -->
+<style>
+.kpi{cursor:pointer}
+.kpi:hover{border-color:rgb(var(--grc-primary))}
+.kdrill{margin:0 0 16px;border:1px solid rgb(var(--grc-border));border-radius:10px;background:rgb(var(--grc-surface));padding:12px;display:none}
+.kdrill.open{display:block}
+.kdh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.kdt{font-size:13px;font-weight:700;color:rgb(var(--grc-text))}
+.kdx{cursor:pointer;color:rgb(var(--grc-muted));font-size:18px;line-height:1;padding:0 6px}
+.kdi{border:1px solid rgb(var(--grc-border));border-left:3px solid rgb(var(--grc-ai));border-radius:8px;padding:10px;margin-bottom:8px;background:rgb(var(--grc-surface2))}
+.kdih{display:flex;align-items:center;gap:8px;cursor:pointer}
+.kdih .t{font-weight:600;color:rgb(var(--grc-text));font-size:13px}
+.kdih .m{font-size:12px;color:rgb(var(--grc-muted));margin-top:4px}
+.kdcaret{color:rgb(var(--grc-muted));font-size:12px}
+.kddet{display:none;margin-top:8px}
+.kddi{padding:8px 0;border-top:1px dashed rgb(var(--grc-border))}
+.kddi .t{font-weight:600;font-size:12px;color:rgb(var(--grc-text))}
+.kddi .m{font-size:12px;color:rgb(var(--grc-muted));margin-top:3px}
+</style>
+<script>
+(function(){
+var AMP=String.fromCharCode(38);
+var Q=String.fromCharCode(34);
+var CR='▸';var CD='▾';
+function kesc(s){s=(s==null?'':''+s);var re=new RegExp('['+AMP+'<>]','g');return s.replace(re,function(ch){return ch===AMP?(AMP+'amp;'):(ch==='<'?(AMP+'lt;'):(AMP+'gt;'));});}
+function j(a){var o=[];for(var i=0;i<a.length;i++){if(a[i]){o.push(a[i]);}}return o.join(' · ');}
+var CFG=[
+{label:'Policies Impacted',t:'x_snc_se_grc_vp_0_grc_policy',q:'reg_impacted=true',rtl:false,title:function(r){return r.name;},sub:function(r){return j([r.owner,r.business_unit,r.lifecycle_stage]);},dt:'x_snc_se_grc_vp_0_reg_impact',dq:function(r){return 'target_id='+r.sys_id;},dkind:'mapping'},
+{label:'Controls Impacted',t:'x_snc_se_grc_vp_0_grc_control',q:'reg_impacted=true',rtl:false,title:function(r){return r.name;},sub:function(r){return j([r.control_id,r.business_unit,(r.effectiveness?('eff '+r.effectiveness):'')]);},dt:'x_snc_se_grc_vp_0_reg_impact',dq:function(r){return 'target_id='+r.sys_id;},dkind:'mapping'},
+{label:'Open Actions',t:'x_snc_se_grc_vp_0_reg_action',q:'status!=completed',rtl:false,title:function(r){return (r.task_number?('['+r.task_number+'] '):'')+(r.short_description||'(action)');},sub:function(r){return j([r.status,r.priority,r.assigned_to,r.due_date]);},dt:'x_snc_se_grc_vp_0_reg_action',dq:function(r){return 'sys_id='+r.sys_id;},dkind:'action'},
+{label:'Approved Mappings',t:'x_snc_se_grc_vp_0_reg_impact',q:'review_decision=accepted',rtl:false,title:function(r){return r.target_label;},sub:function(r){return j([r.record_type,r.priority,r.department]);},dt:'x_snc_se_grc_vp_0_reg_impact',dq:function(r){return 'sys_id='+r.sys_id;},dkind:'mapping'},
+{label:'Risk Reassessments',t:'x_snc_se_grc_vp_0_reg_risk_assessment',q:'approved=true',rtl:false,title:function(r){return r.risk;},sub:function(r){return j(['score '+(r.current_score||'?')+' -> '+(r.proposed_score||'?'),(r.delta?('('+r.delta+')'):''),r.review_decision]);},dt:'x_snc_se_grc_vp_0_reg_risk_assessment',dq:function(r){return 'sys_id='+r.sys_id;},dkind:'risk'},
+{label:'Analyzed Publications',t:'x_snc_se_grc_vp_0_reg_publication',q:'status!=detected',rtl:true,title:function(r){return r.title;},sub:function(r){return j([r.status,r.impact_level,r.publication_date,r.authority]);},dt:'x_snc_se_grc_vp_0_reg_publication',dq:function(r){return 'sys_id='+r.sys_id;},dkind:'pub'}
+];
+var LAST={cfg:null,rows:[]};
+function detCard(t,m,rtl){return '<div class=kddi><div class=t'+(rtl?' dir=auto':'')+'>'+t+'</div>'+m+'</div>';}
+function renderDetail(kind,x){
+if(kind==='mapping'){var t=kesc(x.publication||x.target_label||'(regulatory change)');var m='';if(x.requirement){m+='<div class=m dir=auto>'+kesc('Requirement: '+x.requirement)+'</div>';}if(x.reason){m+='<div class=m dir=auto>'+kesc(x.reason)+'</div>';}var tg=j([x.record_type,x.priority,x.review_decision,x.department]);if(tg){m+='<div class=m>'+kesc(tg)+'</div>';}return detCard(t,m,true);}
+if(kind==='action'){var t=kesc((x.task_number?('['+x.task_number+'] '):'')+(x.short_description||'(action)'));var m='';if(x.publication){m+='<div class=m dir=auto>'+kesc('Source: '+x.publication)+'</div>';}if(x.requirement){m+='<div class=m dir=auto>'+kesc('Requirement: '+x.requirement)+'</div>';}if(x.description){m+='<div class=m dir=auto>'+kesc(x.description)+'</div>';}var tg=j([x.status,x.priority,x.assigned_to,x.due_date,x.business_unit]);if(tg){m+='<div class=m>'+kesc(tg)+'</div>';}return detCard(t,m,true);}
+if(kind==='risk'){var t=kesc(x.risk||'(risk)');var m='';if(x.publication){m+='<div class=m dir=auto>'+kesc('Source: '+x.publication)+'</div>';}if(x.reason){m+='<div class=m dir=auto>'+kesc(x.reason)+'</div>';}if(x.recommended_mitigation){m+='<div class=m dir=auto>'+kesc('Mitigation: '+x.recommended_mitigation)+'</div>';}if(x.related_controls){m+='<div class=m dir=auto>'+kesc('Controls: '+x.related_controls)+'</div>';}m+='<div class=m>'+kesc('score '+(x.current_score||'?')+' -> '+(x.proposed_score||'?'))+'</div>';return detCard(t,m,true);}
+if(kind==='pub'){var t=kesc(x.title||'(publication)');var m='';var tg=j([x.authority,x.source,x.publication_date,x.impact_level]);if(tg){m+='<div class=m dir=auto>'+kesc(tg)+'</div>';}if(x.ai_relevance){m+='<div class=m>'+kesc('AI relevance '+x.ai_relevance+'/100')+'</div>';}if(x.source_url){m+='<div class=m><a href='+Q+x.source_url+Q+' target=_blank style=color:rgb(var(--grc-primary))>Open original</a></div>';}if(x.summary){m+='<div class=m dir=auto>'+kesc((''+x.summary).substring(0,600))+'</div>';}return detCard(t,m,true);}
+return '';
+}
+function fetchJSON(url){return fetch(url,{credentials:'same-origin',headers:{'Accept':'application/json','X-UserToken':window.G_CK}}).then(function(r){return r.json();});}
+function expand(k){var r=LAST.rows[k];if(!r){return;}var det=document.getElementById('kddet-'+k);var car=document.getElementById('kdcaret-'+k);if(!det){return;}if(det.getAttribute('data-open')==='1'){det.style.display='none';det.setAttribute('data-open','0');if(car){car.textContent=CR;}return;}det.style.display='block';det.setAttribute('data-open','1');if(car){car.textContent=CD;}if(det.getAttribute('data-loaded')==='1'){return;}det.setAttribute('data-loaded','1');det.innerHTML='<div class=m>loading…</div>';var cfg=LAST.cfg;var url='/api/now/table/'+cfg.dt+'?sysparm_query='+encodeURIComponent(cfg.dq(r))+AMP+'sysparm_display_value=true'+AMP+'sysparm_limit=50';fetchJSON(url).then(function(d){var rows=(d?d.result:null)||[];if(!rows.length){det.innerHTML='<div class=m>No related regulatory records found.</div>';return;}var hh='';for(var z=0;z<rows.length;z++){hh+=renderDetail(cfg.dkind,rows[z]);}det.innerHTML=hh;}).catch(function(e){det.innerHTML='<div class=m>Could not load context ('+kesc(''+e)+').</div>';});}
+function panel(){var p=document.getElementById('kdrill');if(p){return p;}p=document.createElement('div');p.id='kdrill';p.className='kdrill';p.innerHTML='<div class=kdh><span class=kdt id=kdt></span><span class=kdx id=kdx>'+String.fromCharCode(215)+'</span></div><div id=kdbody></div>';var strip=document.getElementById('kpiStrip');if(strip){if(strip.parentNode){strip.parentNode.insertBefore(p,strip.nextSibling);}}if(!p.parentNode){var w=document.querySelector('.wrap');if(w){w.appendChild(p);}}var x=document.getElementById('kdx');if(x){x.onclick=function(){p.classList.remove('open');};}return p;}
+function drill(i){var cfg=CFG[i];if(!cfg){return;}var p=panel();p.classList.add('open');var td=document.getElementById('kdt');var bd=document.getElementById('kdbody');td.textContent=cfg.label+' — loading…';bd.innerHTML='';var url='/api/now/table/'+cfg.t+'?sysparm_query='+encodeURIComponent(cfg.q)+AMP+'sysparm_display_value=true'+AMP+'sysparm_limit=100';fetchJSON(url).then(function(d){var rows=(d?d.result:null)||[];LAST={cfg:cfg,rows:rows};td.textContent=cfg.label+' ('+rows.length+')';var hh='';if(!rows.length){hh='<div class=kdi><div class=kdih><div style=flex:1><div class=m>No matching records.</div></div></div></div>';}for(var k=0;k<rows.length;k++){var r=rows[k];hh+='<div class=kdi><div class=kdih data-k='+k+'><div style=flex:1><div class=t'+(cfg.rtl?' dir=auto':'')+'>'+kesc(cfg.title(r))+'</div><div class=m>'+kesc(cfg.sub(r))+'</div></div><div class=kdcaret id=kdcaret-'+k+'>'+CR+'</div></div><div class=kddet id=kddet-'+k+'></div></div>';}bd.innerHTML=hh;try{p.scrollIntoView({behavior:'smooth',block:'nearest'});}catch(e){}}).catch(function(e){td.textContent=cfg.label;bd.innerHTML='<div class=kdi><div class=kdih><div style=flex:1><div class=m>Could not load ('+kesc(''+e)+').</div></div></div></div>';});}
+function route(lbl){var map={'Requirements':'AI Analysis','New Obligations':'AI Analysis','Impacted Policies':'GRC Impact','Impacted Controls':'GRC Impact','Impacted Depts':'GRC Impact','Related Risks':'Risk','Open Actions':'Actions'};var t=map[lbl];if(t){if(window.setTab){window.setTab(t);}}}
+function anc(n,cls){var g=0;while(n){if(g>10){break;}g++;var cn=(n.className?(''+n.className):'');if(cn.split){if(cn.split(' ').indexOf(cls)>=0){return n;}}n=n.parentNode;}return null;}
+document.addEventListener('click',function(ev){var kih=anc(ev.target,'kdih');if(kih){var kk=kih.getAttribute('data-k');if(kk!==null){expand(parseInt(kk,10));}return;}var card=anc(ev.target,'kpi');if(!card){return;}var strip=document.getElementById('kpiStrip');if(strip){if(strip.contains(card)){var kids=strip.children;var idx=-1;for(var i=0;i<kids.length;i++){if(kids[i]===card){idx=i;}}if(idx>=0){drill(idx);}return;}}var body=document.getElementById('tabBody');if(body){if(body.contains(card)){var ln=card.querySelector?card.querySelector('.l'):null;if(ln){route(ln.textContent||'');}}}},true);
+})();
+</script>
+<!-- KPIDRILL-END -->
+<!-- STEPNAV-START (reversible: delete this block) -->
+<style>
+.step{cursor:pointer}
+.step:hover{border-color:rgb(var(--grc-primary))}
+</style>
+<script>
+(function(){
+var MAP=['Source','AI Analysis','GRC Impact','GRC Impact','Actions','Risk'];
+function anc(n,cls){var g=0;while(n){if(g>10){break;}g++;var cn=(n.className?(''+n.className):'');if(cn.split){if(cn.split(' ').indexOf(cls)>=0){return n;}}n=n.parentNode;}return null;}
+document.addEventListener('click',function(ev){var st=anc(ev.target,'step');if(!st){return;}var sp=document.getElementById('stepper');if(!sp){return;}if(!sp.contains(st)){return;}var kids=sp.children;var idx=-1;for(var i=0;i<kids.length;i++){if(kids[i]===st){idx=i;}}if(idx<0){return;}var tab=MAP[idx];if(!tab){return;}if(window.setTab){window.setTab(tab);}var pnl=document.querySelector('.layout');if(pnl){try{pnl.scrollIntoView({behavior:'smooth',block:'nearest'});}catch(e){}}},true);
+})();
+</script>
+<!-- STEPNAV-END -->
+</body>
+</html>
+]]></html>
+        <name>reg_intel_workbench</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 13:23:55</sys_created_on>
+        <sys_id>0bd36693c33f4b10f68a54bf05013177</sys_id>
+        <sys_mod_count>17</sys_mod_count>
+        <sys_name>reg_intel_workbench</sys_name>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sys_ui_page_0bd36693c33f4b10f68a54bf05013177</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-19 12:23:04</sys_updated_on>
+    </sys_ui_page>
+</record_update>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sn_aia_version">
+    <sn_aia_version action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <applicability_script><![CDATA[/** 
+ * Function to determine applicability of this version based on runtime inputs 
+ * 
+ * @param {Object} inputs - The input parameters object 
+ * @param {string} inputs.channel - The channel the request originated from (e.g., 'voice', 'chat') 
+ * 
+ * @returns {boolean} Returns true/false 
+(function(inputs) {
+    return inputs.channel == 'voice' ; 
+})(inputs);*/
+(function(inputs) {
+    return inputs.channel == 'ALL';
+})(inputs);]]></applicability_script>
+        <base_version/>
+        <change_description>Initial version</change_description>
+        <condition/>
+        <eval_score/>
+        <instructions>You are the Saudi Energy Regulatory Change Intelligence Agent. Given a regulatory publication record ID, use your tools to: (1) Get Publication, (2) Analyze Regulation to extract and save requirements from the ACTUAL source text (never invent requirements, penalties or dates; if text is insufficient, say so), (3) Find GRC Impact against existing policies/controls/risks and explain why each is affected, (4) Recommend Actions for confirmed impacts, (5) Assess Regulatory Risk for related risks. Separate confirmed source facts from potential business impacts. Not every publication is relevant to Saudi Energy - judge honestly. Store results via the tools; never rely on chat text alone. Hand off human review (accept/modify/reject) and task creation to the reviewer.</instructions>
+        <label/>
+        <layer>overlay</layer>
+        <order/>
+        <short_description/>
+        <snapshot>{"schemaVersion":2,"definition":{"name":"Saudi Energy Regulatory Intelligence Agent","description":"Understands official regulatory publications, identifies obligations, maps impact to the existing Saudi Energy GRC environment and recommends compliance actions and risk reassessments.","role":"Regulatory Change Intelligence analyst for Saudi Energy GRC"},"overlay":{"tools":[{"m2mId":"2b965e5fc3774b10f68a54bf0501311f","toolId":"2116565bc3774b10f68a54bf050131d4","executionMode":"copilot","inputs":null,"active":true},{"m2mId":"3f965e5fc3774b10f68a54bf0501312f","toolId":"2d16565bc3774b10f68a54bf050131d9","executionMode":"copilot","inputs":null,"active":true},{"m2mId":"77965e5fc3774b10f68a54bf050131b8","toolId":"ad16965bc3774b10f68a54bf05013103","executionMode":"copilot","inputs":null,"active":true},{"m2mId":"b3965e5fc3774b10f68a54bf05013140","toolId":"2916565bc3774b10f68a54bf050131df","executionMode":"copilot","inputs":null,"active":true},{"m2mId":"d3961adbc3374b10f68a54bf05013161","toolId":"21165edfc3374b10f68a54bf05013144","executionMode":"copilot","inputs":null,"active":true},{"m2mId":"fb965e5fc3774b10f68a54bf050131a7","toolId":"2516565bc3774b10f68a54bf050131e5","executionMode":"copilot","inputs":null,"active":true}],"children":[],"security":{"externalDiscoverable":"0","specialistEnabled":"0","runAsUser":"","userAccessRoles":[],"dataAccessRoles":[]}}}</snapshot>
+        <state>committed</state>
+        <sys_class_name>sn_aia_version</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-13 12:23:45</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_id>2116965bc3774b10f68a54bf05013139</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>Version 1</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SE GRC VP Command Center">30520124c3f7c750240c50c4e40131f8</sys_scope>
+        <sys_update_name>sn_aia_version_2116965bc3774b10f68a54bf05013139</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-13 12:26:05</sys_updated_on>
+        <tags/>
+        <target_id>2d16965bc3774b10f68a54bf05013109</target_id>
+        <target_table>sn_aia_agent</target_table>
+        <version_name>Version 1</version_name>
+        <version_number>1</version_number>
+    </sn_aia_version>
+</record_update>

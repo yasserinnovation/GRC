@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="95c3477b3ad8443c8288a350e860815c" label="DoA Rule" name="x_snc_se_grc_vp_0_doa_rule" type="collection">
+        <element default="SAR" label="Currency" max_length="10" name="currency" type="string"/>
+        <element label="Effective To" name="effective_to" type="glide_date"/>
+        <element label="Transaction Type" max_length="120" name="transaction_type" type="string"/>
+        <element default="1.0" label="Version" max_length="20" name="version" type="string"/>
+        <element default="javascript:getNextObjNumberPadded();" label="Number" max_length="40" name="number" type="string"/>
+        <element label="Authority Role" max_length="120" name="authority_role" type="string"/>
+        <element label="Holder" max_length="120" name="holder" type="string"/>
+        <element label="Governing Reference" max_length="255" name="governing_reference" type="string"/>
+        <element label="Conditions" max_length="2000" name="conditions" type="multi_two_lines"/>
+        <element label="Approval Limit" name="approval_limit" type="decimal"/>
+        <element label="Governing Policy" name="governing_policy" reference="x_snc_se_grc_vp_0_grc_policy" reference_cascade_rule="none" type="reference"/>
+        <element label="Effective From" name="effective_from" type="glide_date"/>
+        <element label="Department" max_length="120" name="department" type="string"/>
+        <element default="true" label="Is Demo" name="is_demo" type="boolean"/>
+        <element label="Business Unit" max_length="120" name="business_unit" type="string"/>
+        <element label="Entity" max_length="120" name="entity" type="string"/>
+        <element default="active" label="Status" max_length="40" name="status" type="string"/>
+        <element label="Escalation Authority" max_length="120" name="escalation_authority" type="string"/>
+        <index name="index">
+            <element name="governing_policy"/>
+        </index>
+    </element>
+</database>

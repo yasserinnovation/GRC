@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" audit="true" db_object_id="5f38d4ec13d746e1b873c746c27af14e" label="Regulatory Impact Mapping" name="x_snc_se_grc_vp_0_reg_impact" type="collection">
+        <element default="pending" label="Review Decision" name="review_decision" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Rejected" sequence="4" value="rejected"/>
+                <element inactive_on_update="false" label="Pending" sequence="1" value="pending"/>
+                <element inactive_on_update="false" label="Modified" sequence="3" value="modified"/>
+                <element inactive_on_update="false" label="Accepted" sequence="2" value="accepted"/>
+            </choice>
+        </element>
+        <element label="Reviewer" max_length="120" name="reviewer" type="string"/>
+        <element display="true" label="Target Label" max_length="255" name="target_label" type="string"/>
+        <element label="Record Type" name="record_type" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Control" sequence="2" value="control"/>
+                <element inactive_on_update="false" label="Policy" sequence="1" value="policy"/>
+                <element inactive_on_update="false" label="Risk" sequence="3" value="risk"/>
+                <element inactive_on_update="false" label="Obligation" sequence="5" value="obligation"/>
+                <element inactive_on_update="false" label="Business Unit" sequence="4" value="business_unit"/>
+            </choice>
+        </element>
+        <element label="Reviewed On" name="reviewed_on" type="glide_date_time"/>
+        <element label="Requirement" name="requirement" reference="x_snc_se_grc_vp_0_reg_requirement" reference_cascade_rule="none" type="reference"/>
+        <element label="Publication" name="publication" reference="x_snc_se_grc_vp_0_reg_publication" reference_cascade_rule="cascade" type="reference"/>
+        <element label="Department" max_length="120" name="department" type="string"/>
+        <element label="Target ID" max_length="32" name="target_id" type="string"/>
+        <element default="medium" label="Priority" name="priority" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Low" sequence="1" value="low"/>
+                <element inactive_on_update="false" label="Critical" sequence="4" value="critical"/>
+                <element inactive_on_update="false" label="Medium" sequence="2" value="medium"/>
+                <element inactive_on_update="false" label="High" sequence="3" value="high"/>
+            </choice>
+        </element>
+        <element label="Reason" max_length="2000" name="reason" type="string"/>
+        <element label="Target Table" max_length="120" name="target_table" type="string"/>
+        <index name="index">
+            <element name="publication"/>
+        </index>
+        <index name="index2">
+            <element name="requirement"/>
+        </index>
+    </element>
+</database>

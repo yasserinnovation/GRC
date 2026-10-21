@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" audit="true" db_object_id="9fd0d1667cc74261b9d036c7cdab22d4" label="GRC Risk" name="x_snc_se_grc_vp_0_grc_risk" type="collection">
+        <element display="true" label="Name" mandatory="true" max_length="255" name="name" type="string"/>
+        <element label="Category" max_length="120" name="category" type="string"/>
+        <element attributes="scale=2" label="Financial Exposure (SAR millions)" name="financial_exposure" type="decimal"/>
+        <element label="Residual Score" name="residual_score" type="integer"/>
+        <element label="Business Unit" max_length="120" name="business_unit" type="string"/>
+        <element label="Appetite" name="appetite" type="integer"/>
+        <element label="Tolerance" name="tolerance" type="integer"/>
+        <element label="Control Effectiveness" name="control_effectiveness" type="integer"/>
+    </element>
+</database>

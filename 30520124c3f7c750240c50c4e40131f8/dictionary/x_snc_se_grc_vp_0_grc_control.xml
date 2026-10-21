@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" audit="true" db_object_id="f3f3bff526e04535885cc7e544fefe86" label="GRC Control" name="x_snc_se_grc_vp_0_grc_control" type="collection">
+        <element label="Control ID" max_length="60" name="control_id" type="string"/>
+        <element label="Owner" max_length="120" name="owner" type="string"/>
+        <element display="true" label="Name" mandatory="true" max_length="255" name="name" type="string"/>
+        <element label="Family" max_length="120" name="family" type="string"/>
+        <element label="Business Unit" max_length="120" name="business_unit" type="string"/>
+        <element label="Effectiveness" name="effectiveness" type="integer"/>
+        <element default="true" label="Active" name="active" type="boolean"/>
+        <element label="Regulatory Impacted" name="reg_impacted" type="boolean"/>
+    </element>
+</database>

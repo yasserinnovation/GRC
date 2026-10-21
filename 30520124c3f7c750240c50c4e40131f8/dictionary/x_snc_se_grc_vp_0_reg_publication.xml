@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" audit="true" db_object_id="de96e825ae30405bb0274de33b750847" label="Regulatory Publication" name="x_snc_se_grc_vp_0_reg_publication" type="collection">
+        <element label="Full Text" max_length="32000" name="full_text" type="translated_text"/>
+        <element default="detected" label="Status" name="status" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Detected" sequence="1" value="detected"/>
+                <element inactive_on_update="false" label="Analyzed" sequence="2" value="analyzed"/>
+                <element inactive_on_update="false" label="Actions Created" sequence="5" value="actions_created"/>
+                <element inactive_on_update="false" label="Risk Assessed" sequence="6" value="risk_assessed"/>
+                <element inactive_on_update="false" label="Reviewed" sequence="4" value="reviewed"/>
+                <element inactive_on_update="false" label="Mapped" sequence="3" value="mapped"/>
+            </choice>
+        </element>
+        <element label="Publication Date" name="publication_date" type="glide_date"/>
+        <element default="demo" label="Source" name="source" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Umm Al-Qura — Decisions &amp; Regulations" sequence="1" value="umm_al_qura_decisions"/>
+                <element inactive_on_update="false" label="Demonstration Data" sequence="4" value="demo"/>
+                <element inactive_on_update="false" label="Umm Al-Qura — Gazette" sequence="2" value="umm_al_qura_gazette"/>
+                <element inactive_on_update="false" label="PDF Upload" sequence="3" value="pdf_upload"/>
+            </choice>
+        </element>
+        <element label="AI Relevance" name="ai_relevance" type="integer"/>
+        <element label="Is Demo" name="is_demo" type="boolean"/>
+        <element display="true" label="Title" mandatory="true" max_length="255" name="title" type="string"/>
+        <element default="ar" label="Language" name="language" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Arabic" sequence="1" value="ar"/>
+                <element inactive_on_update="false" label="English" sequence="2" value="en"/>
+                <element inactive_on_update="false" label="Mixed" sequence="3" value="mixed"/>
+            </choice>
+        </element>
+        <element label="Authority" max_length="255" name="authority" type="string"/>
+        <element label="Summary" max_length="4000" name="summary" type="string"/>
+        <element label="Category" max_length="120" name="category" type="string"/>
+        <element default="true" label="Active" name="active" type="boolean"/>
+        <element label="External ID" max_length="255" name="external_id" type="string"/>
+        <element default="unknown" label="Impact Level" name="impact_level" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="High" sequence="4" value="high"/>
+                <element inactive_on_update="false" label="Critical" sequence="5" value="critical"/>
+                <element inactive_on_update="false" label="Low" sequence="2" value="low"/>
+                <element inactive_on_update="false" label="Unknown" sequence="1" value="unknown"/>
+                <element inactive_on_update="false" label="Moderate" sequence="3" value="moderate"/>
+            </choice>
+        </element>
+        <element label="Source URL" max_length="1024" name="source_url" type="url"/>
+    </element>
+</database>

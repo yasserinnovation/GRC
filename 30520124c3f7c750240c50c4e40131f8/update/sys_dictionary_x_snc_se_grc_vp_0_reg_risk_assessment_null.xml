@@ -53,7 +53,6 @@
         <sys_class_name>sys_dictionary</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2026-10-13 09:31:36</sys_created_on>
-        <sys_id>4de2f396d90b426e968c2e39b0149176</sys_id>
         <sys_name>x_snc_se_grc_vp_0_reg_risk_assessment</sys_name>
         <sys_package display_value="SE GRC VP Command Center" source="x_snc_se_grc_vp_0">30520124c3f7c750240c50c4e40131f8</sys_package>
         <sys_policy/>
